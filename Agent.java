@@ -97,8 +97,8 @@ public class Agent {
                     }
                  }
             	lefttop = new Position(75,75);
-            	righttop = new Position(80,75);
-            	leftbottom = new Position(75,80);
+            	righttop = new Position(75,80);
+            	leftbottom = new Position(80,75);
             	rightbottom = new Position(80,80);
             	map[77][77] = 'p';
             	Position finish = new Position(77,77);
@@ -109,29 +109,32 @@ public class Agent {
             		int x = lefttop.x;
             		int y = lefttop.y;
             		for(j = 0; j < 5; j++){
-            			map[x+j][y+1] = view[0][j];
+            			map[x+1][y+j] = view[0][j];
+            			if(view[0][j] == '$'){
+            				Position gold = new Position(x+j,y+1);
+            			}
             		}
-            		if(map[x+2][y-1] == 'k'){
-            			map[x+2][y-1] = ' ';
+            		if(map[x-1][y+2] == 'k'){
+            			map[x-1][y+2] = ' ';
             			key = true;
             		}
-            		if(map[x+2][y-1] == 'a'){
-            			map[x+2][y-1] = ' ';
+            		if(map[x-1][y+2] == 'a'){
+            			map[x-1][y+2] = ' ';
             			axe = true;
             		}
-            		if(map[x+2][y-1] == 'd'){
-            			map[x+2][y-1] = ' ';
+            		if(map[x-1][y+2] == 'd'){
+            			map[x-1][y+2] = ' ';
             			dynHeld++;
             		}
-            		if(map[x+2][y-1] == '$'){
-            			map[x+2][y-1] = ' ';
+            		if(map[x-1][y+2] == '$'){
+            			map[x-1][y+2] = ' ';
             			gold = true;
             		}
-            		if(map[x+2][y-1] == ' ' && map[x+2][y-2]=='~'){
+            		if(map[x-1][y+2] == ' ' && map[x-2][y+2]=='~'){
             			raft = false;
             		}
-            		lefttop.setPosition(x, y+1);
-            		righttop.setPosition(x, y+1);
+            		lefttop.setPosition(x+1, y);
+            		righttop.setPosition(x+1, y);
             	}
             	else if(lastMove == 'r'){
             		holder = lefttop;
@@ -148,14 +151,14 @@ public class Agent {
         		righttop = holder;
             	}
             	else if(lastMove=='c'){
-            	map[lefttop.x+2][lefttop.y-1] = ' ';
+            	map[lefttop.x-1][lefttop.y+2] = ' ';
             	raft = true;
             	}
             	else if(lastMove == 'b'){
-            	map[lefttop.x+2][lefttop.y-1] = ' ';
+            	map[lefttop.x-1][lefttop.y+2] = ' ';
             	}
             	else if(lastMove == 'u'){
-            	map[lefttop.x+2][lefttop.y-1] = ' ';
+            	map[lefttop.x-1][lefttop.y+2] = ' ';
             	}
             	}
             
