@@ -1,8 +1,8 @@
+/*  Agent.java  
  *  Sample Agent for Text-Based Adventure Game
  *  COMP3411 Artificial Intelligence
  *  UNSW Session 1, 2017
 */
-
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -17,21 +17,20 @@ public class Agent {
 	static Position righttop = null;
 	static Position leftbottom = null;
 	static Position rightbottom = null;
-
+	static char lastMove = 0;
 	private static char[][] map = new char[155][155];
 
 	boolean on_raft = false;
+	private Random random = new Random();
 	
-	private char[][] map = new char[155][155];
 
    public char get_action( char view[][] ) {
 	 char action = 0;
 	 char ch= 0;
 	//TreeMap<Character, Integer> possMoves = new TreeMap<Character, Integer>();
-	   //legal moves
+	   //legal moves	 
 	 
-	 
-			 ch=view[1][2];	
+			 ch = view[1][2];	
 			 
 			 if (ch == 'T' && axe){
 				  action = 'C';
@@ -55,11 +54,14 @@ public class Agent {
 				   action = 'F';			   
 			   }
 			   if (ch == ' '){
-				   action = 'F';
-			   } 
+				   if( lastMove== 'F'){
+					char [] commands = new char [] { 'L', 'R' };			  
+					action = commands[ random.nextInt( commands.length ) ];
+					}
+			    
+			   else action ='F'; 
+   }
 			   else action ='L';
-		
-	   
 	   
 	   return action;
    }
