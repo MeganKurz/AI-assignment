@@ -1,6 +1,3 @@
-
-/*********************************************
- *  Agent.java 
  *  Sample Agent for Text-Based Adventure Game
  *  COMP3411 Artificial Intelligence
  *  UNSW Session 1, 2017
@@ -11,7 +8,7 @@ import java.io.*;
 import java.net.*;
 
 public class Agent {
-	static int dynHeld = 0;
+  static int dynHeld = 0;
 	static boolean key = false;
 	static boolean axe = false;
 	static boolean raft = false;
@@ -23,10 +20,49 @@ public class Agent {
 
 	private static char[][] map = new char[155][155];
 
-	public char get_action(char view[][]) {
+	boolean on_raft = false;
+	
+	private char[][] map = new char[155][155];
 
-		return 0;
-	}
+   public char get_action( char view[][] ) {
+	 char action = 0;
+	 char ch= 0;
+	//TreeMap<Character, Integer> possMoves = new TreeMap<Character, Integer>();
+	   //legal moves
+	 
+	 
+			 ch=view[1][2];	
+			 
+			 if (ch == 'T' && axe){
+				  action = 'C';
+			   }
+			   //if (ch == 'T' && !(axe) && dynHeld>=1){
+			   //   action = 'B';
+			   //   dynHeld--;
+			   // }
+			   if (ch == '-' && key){
+				  action = 'U'; 
+			      }
+			  // if (ch == '-' && !(key) && dynHeld>=1){
+			  //   action = 'B';
+			  //	   dynHeld--;
+			  // }
+			  // if (ch == '*' &&  dynHeld>=1){
+			 //	   action = 'B';
+			 //	   dynHeld--;
+			 // }
+			   if (ch == '~' && raft){
+				   action = 'F';			   
+			   }
+			   if (ch == ' '){
+				   action = 'F';
+			   } 
+			   else action ='L';
+		
+	   
+	   
+	   return action;
+   }
 
 	void print_view(char view[][]) {
 		int i, j;
