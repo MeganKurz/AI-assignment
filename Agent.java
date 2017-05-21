@@ -1,5 +1,4 @@
-/*********************************************
- *  Agent.java 
+/*  Agent.java 
  *  Sample Agent for Text-Based Adventure Game
  *  COMP3411 Artificial Intelligence
  *  UNSW Session 1, 2017
@@ -15,12 +14,49 @@ public class Agent {
 	boolean axe = false;
 	boolean raft = false;
 	boolean gold = false;
+	boolean on_raft = false;
+	boolean treasure= false;
 	
 	private char[][] map = new char[155][155];
 
    public char get_action( char view[][] ) {
-
-	   return 0;
+	 char action = 0;
+	 char ch= 0;
+	//TreeMap<Character, Integer> possMoves = new TreeMap<Character, Integer>();
+	   //legal moves
+	 
+	 
+			 ch=view[1][2];	
+			 
+			 if (ch == 'T' && axe){
+				  action = 'C';
+			   }
+			   //if (ch == 'T' && !(axe) && dynHeld>=1){
+			   //   action = 'B';
+			   //   dynHeld--;
+			   // }
+			   if (ch == '-' && key){
+				  action = 'U'; 
+			      }
+			  // if (ch == '-' && !(key) && dynHeld>=1){
+			  //   action = 'B';
+			  //	   dynHeld--;
+			  // }
+			  // if (ch == '*' &&  dynHeld>=1){
+			 //	   action = 'B';
+			 //	   dynHeld--;
+			 // }
+			   if (ch == '~' && raft){
+				   action = 'F';			   
+			   }
+			   if (ch == ' '){
+				   action = 'F';
+			   } 
+			   else action ='L';
+		
+	   
+	   
+	   return action;
    }
 
    void print_view( char view[][] )
