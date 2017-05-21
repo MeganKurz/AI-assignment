@@ -10,32 +10,17 @@ import java.io.*;
 import java.net.*;
 
 public class Agent {
+	int dynHeld = 0;
+	boolean key = false;
+	boolean axe = false;
+	boolean raft = false;
+	boolean gold = false;
+	
+	private char[][] map = new char[155][155];
 
    public char get_action( char view[][] ) {
 
-      // REPLACE THIS CODE WITH AI TO CHOOSE ACTION
-
-      int ch=0;
-
-      System.out.print("Enter Action(s): ");
-
-      try {
-         while ( ch != -1 ) {
-            // read character from keyboard
-            ch  = System.in.read();
-
-            switch( ch ) { // if character is a valid action, return it
-            case 'F': case 'L': case 'R': case 'C': case 'U': case 'B':
-            case 'f': case 'l': case 'r': case 'c': case 'u': case 'b':
-               return((char) ch );
-            }
-         }
-      }
-      catch (IOException e) {
-         System.out.println ("IO error:" + e );
-      }
-
-      return 0;
+	   return 0;
    }
 
    void print_view( char view[][] )
@@ -69,7 +54,8 @@ public class Agent {
       int port;
       int ch;
       int i,j;
-
+      char lastMove = 0;
+      
       if( args.length < 2 ) {
          System.out.println("Usage: java Agent -p <port>\n");
          System.exit(-1);
@@ -87,7 +73,7 @@ public class Agent {
          System.exit(-1);
       }
 
-      try { // scan 5-by-5 wintow around current location
+      try { // scan 5-by-5 window around current location
          while( true ) {
             for( i=0; i < 5; i++ ) {
                for( j=0; j < 5; j++ ) {
@@ -101,6 +87,15 @@ public class Agent {
                }
             }
             agent.print_view( view ); // COMMENT THIS OUT BEFORE SUBMISSION
+            if(lastMove == 0){
+            	for( i=0; i < 5; i++ ) {
+                    for( j=0; j < 5; j++ ) {
+                       if( !(( i == 2 )&&( j == 2 ))) {
+                          
+                       }
+                    }
+                 }
+            }
             action = agent.get_action( view );
             out.write( action );
          }
@@ -116,4 +111,31 @@ public class Agent {
          catch( IOException e ) {}
       }
    }
+}
+
+
+class Position{
+	int x;
+	int y;
+
+public Position(int x,int y){
+	this.x = x;
+	this.y = y;
+}
+	
+void setPosition(int x, int y){
+	this.x = x;
+	this.y = y;
+}
+
+int compareX(Position p1, Position p2){
+	int dif = p1.x - p2.x;
+	return dif;
+}
+
+int compareY(Position p1, Position p2){
+	int dif = p1.y - p2.y;
+	return dif;
+}
+
 }
