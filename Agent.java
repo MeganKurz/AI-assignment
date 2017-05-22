@@ -271,19 +271,20 @@ public class Agent {
             		}            	
             	}
             	else if(lastMove == 'B'){
-            		if(dirn==0 && map[current.x][current.y+1]!='~'){
+            		dynHeld--;
+            		if(dirn==0 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
             			map[current.x][current.y+1] = ' ';
                     	
             		}
-            		if(dirn==1 && map[current.x][current.y+1]!='~'){
+            		if(dirn==1 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
             			map[current.x-1][current.y] = ' ';
                     	
             		}
-            		if(dirn==2 && map[current.x][current.y+1]!='~'){
+            		if(dirn==2 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
             			map[current.x][current.y-1] = ' ';
                     	
             		}
-            		if(dirn==3 && map[current.x][current.y+1]!='~'){
+            		if(dirn==3 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
             			map[current.x+1][current.y] = ' ';
                     	
             		}   
