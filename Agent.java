@@ -19,6 +19,7 @@ public class Agent {
 	static Position rightbottom = null;
 	static Position current = null;
 	static Position infront = null;
+	static Position treasure =null;
 	static char lastMove = 0;
 	final static int EAST   = 0;
 	final static int NORTH  = 1;
@@ -26,49 +27,50 @@ public class Agent {
 	final static int SOUTH  = 3;
 	private static int dirn;
 	private static char[][] map = new char[155][155];
-
+	
 	boolean on_raft = false;
 	private Random random = new Random();
 	
 
-   public char get_action( char view[][] ) {
+   public char get_action( char map[][] ) {
 	 char action = 0;
-	 char ch= 0;
-	//TreeMap<Character, Integer> possMoves = new TreeMap<Character, Integer>();
-	   //legal moves	 
-	 
-			 ch = view[1][2];	
+	 char ch= 0;		 
+			 ch = map[infront.x][infront.y];
 			 
+			//while agent hasn't found the treasure randomly walk around
+			 while(treasure==null){ 
+				 
 			 if (ch == 'T' && axe){
 				  action = 'C';
 			   }
 			   //if (ch == 'T' && !(axe) && dynHeld>=1){
-			   //   action = 'B';
-			   //   dynHeld--;
+			   //   action = 'B';			   
 			   // }
 			   if (ch == '-' && key){
 				  action = 'U'; 
 			      }
 			  // if (ch == '-' && !(key) && dynHeld>=1){
-			  //   action = 'B';
-			  //	   dynHeld--;
+			  //   action = 'B';			  
 			  // }
 			  // if (ch == '*' &&  dynHeld>=1){
-			 //	   action = 'B';
-			 //	   dynHeld--;
+			 //	   action = 'B';			
 			 // }
 			   if (ch == '~' && raft){
 				   action = 'F';			   
 			   }
 			   if (ch == ' '){
-				   if( lastMove== 'F'){
-					char [] commands = new char [] { 'L', 'R' };			  
-					action = commands[ random.nextInt( commands.length ) ];
-					}
+				   //if( lastMove== 'F'){
+					//char [] commands = new char [] { 'L', 'R' };			  
+					//action = commands[ random.nextInt( commands.length ) ];
+					//}
 			    
-			   else action ='F'; 
+			  action ='F'; 
    }
-			   else action ='L';
+			   else{
+				   char [] commands = new char [] { 'L', 'R' };			  
+					action = commands[ random.nextInt( commands.length ) ];
+			   }
+			   }
 	   
 	   return action;
    }
@@ -90,7 +92,23 @@ public class Agent {
 		}
 		System.out.println("+-----+");
 	}
+	void print_map(char map[][]) {
+		int i, j;
 
+		
+		for (i = 0; i < 155; i++) {
+			System.out.print("|");
+			for (j = 0; j < 155; j++) {
+				if ((i == current.x) && (j == current.y)) {
+					System.out.print('^');
+				} else {
+					System.out.print(map[i][j]);
+				}
+			}
+			System.out.println("|");
+		}
+		
+	}
 	public static void main( String[] args )
    {
       InputStream in  = null;
@@ -103,6 +121,12 @@ public class Agent {
       int ch;
       int i,j;
       
+      for(int k=0 ; k<155; k++){
+  		for(int z=0 ; z<155; z++){
+  			map[k][z]=0;
+  		}
+  		
+  	}
       
       if( args.length < 2 ) {
          System.out.println("Usage: java Agent -p <port>\n");
@@ -135,6 +159,7 @@ public class Agent {
                }
             }
             agent.print_view( view ); // COMMENT THIS OUT BEFORE SUBMISSION
+            agent.print_map( map );
             if(lastMove == 0){
             	dirn=1;
             	current = new Position(77, 77);
@@ -143,7 +168,7 @@ public class Agent {
                     for( j=0; j < 5; j++ ) {
                       map[75+i][75+j] = view[i][j]; 
                       if(view[i][j] == '$'){
-          				Position gold = new Position(i, j);
+          				treasure = new Position(i, j);
           				}
                     }
                  }
@@ -152,7 +177,7 @@ public class Agent {
             	leftbottom = new Position(79,75);
             	rightbottom = new Position(79,79);
             	map[77][77] = 'p';
-            	Position finish = new Position(77,77);
+            	
             }
             else{
             	Position holder = null;
@@ -163,7 +188,7 @@ public class Agent {
             			for(i = 0; i < 5; i++){
                 			map[x+i][y+1] = view[0][i];
                 		if(view[0][i] == '$'){
-                				Position gold = new Position(x+i,y+1);
+                				treasure = new Position(x+i,y+1);
                 			}
                 		} 
             			lefttop.setPosition(x, y+1);
@@ -177,7 +202,7 @@ public class Agent {
             			for(j = 0; j < 5; j++){
                 			map[x-1][y+j] = view[0][j];
                 		if(view[0][j] == '$'){
-                				Position gold = new Position(x-1,y+j);
+                				treasure = new Position(x-1,y+j);
                 			}                
                 		}  
             			lefttop.setPosition(x-1, y);
@@ -191,7 +216,7 @@ public class Agent {
             			for(i = 0; i < 5; i++){
                 			map[x-i][y-1] = view[0][i];
                 		if(view[0][i] == '$'){
-                				Position gold = new Position(x-i,y-1);
+                				treasure = new Position(x-i,y-1);
                 			}
                 		} 
             			lefttop.setPosition(x, y-1);
@@ -205,7 +230,7 @@ public class Agent {
             			for(j = 0; j < 5; j++){
                 			map[x+1][y-j] = view[0][j];
                 		if(view[0][j] == '$'){
-                				Position gold = new Position(x+1,y-j);
+                				treasure = new Position(x+1,y-j);
                 			}
                 		}  
             			lefttop.setPosition(x+1, y);
@@ -285,7 +310,7 @@ public class Agent {
             		}
             	}
             
-            action = agent.get_action( view );
+            action = agent.get_action( map );
             lastMove = action;
             out.write( action );
          }
