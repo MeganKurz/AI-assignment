@@ -18,6 +18,7 @@ public class Agent {
 	static Position leftbottom = null;
 	static Position rightbottom = null;
 	static Position current = null;
+	static Position infront = null;
 	static char lastMove = 0;
 	final static int EAST   = 0;
 	final static int NORTH  = 1;
@@ -137,6 +138,7 @@ public class Agent {
             if(lastMove == 0){
             	dirn=1;
             	current = new Position(77, 77);
+            	infront = new Position(76, 77);
             	for( i=0; i < 5; i++ ) {
                     for( j=0; j < 5; j++ ) {
                       map[75+i][75+j] = view[i][j]; 
@@ -168,7 +170,8 @@ public class Agent {
                 		righttop.setPosition(x+4, y+1);
                 		rightbottom.setPosition(x+4, y-3);
                 		leftbottom.setPosition(x, y-3);
-                		current.setPosition(x+2, y-1);
+                		current.setPosition(x+2, y-1);                		
+                		infront.setPosition(x+2, y);
             		}
             		if (dirn ==1){
             			for(j = 0; j < 5; j++){
@@ -182,6 +185,7 @@ public class Agent {
                 		rightbottom.setPosition(x+3, y+4);
                 		leftbottom.setPosition(x+3, y);
                 		current.setPosition(x+1, y+2);
+                		infront.setPosition(x, y+2);
             		}
             		if (dirn ==2){
             			for(i = 0; i < 5; i++){
@@ -195,6 +199,7 @@ public class Agent {
                 		rightbottom.setPosition(x-4, y+3);
                 		leftbottom.setPosition(x, y+3);
                 		current.setPosition(x-2, y+1);
+                		infront.setPosition(x-2, y);
             		}
             		if (dirn ==3){
             			for(j = 0; j < 5; j++){
@@ -208,6 +213,7 @@ public class Agent {
                 		rightbottom.setPosition(x-3, y-4);
                 		leftbottom.setPosition(x-3, y);
                 		current.setPosition(x-1, y-2);
+                		infront.setPosition(x, y-2);
             		}
             		
             		x = current.x;
@@ -236,77 +242,47 @@ public class Agent {
             		}
             		
             	}
-            	else if(lastMove == 'R'){            		           	     
+            	else if(lastMove == 'R'){  
+            		int x = current.x;
+            		int y = current.y; 
             	    dirn = ( dirn + 3 ) % 4;            	         
             		holder = lefttop;
             		lefttop = righttop;
             		righttop = rightbottom;
             		rightbottom = leftbottom;
             		leftbottom = holder;
+            		if(dirn ==0) infront.setPosition(x, y+1);
+            		if(dirn ==1) infront.setPosition(x-1, y);
+            		if(dirn ==2) infront.setPosition(x, y-1);
+            		if(dirn ==3) infront.setPosition(x+1, y);
             	}
-            	else if(lastMove=='L'){            		
+            	else if(lastMove=='L'){  
+            	int x = current.x;
+            	int y = current.y; 
            	    dirn = ( dirn + 1 ) % 4;          	      
             	holder = lefttop;
         		lefttop = leftbottom;
         		leftbottom = rightbottom;
         		rightbottom = righttop;
         		righttop = holder;
+        		if(dirn ==0) infront.setPosition(x, y+1);
+        		if(dirn ==1) infront.setPosition(x-1, y);
+        		if(dirn ==2) infront.setPosition(x, y-1);
+        		if(dirn ==3) infront.setPosition(x+1, y);
             	}
-            	else if(lastMove=='C'){
-            		if(dirn==0 && map[current.x][current.y+1]=='T'){
-            			map[current.x][current.y+1] = ' ';
-                    	raft = true;
-            		}
-            		if(dirn==1 && map[current.x][current.y+1]=='T'){
-            			map[current.x-1][current.y] = ' ';
-                    	raft = true;
-            		}
-            		if(dirn==2 && map[current.x][current.y+1]=='T'){
-            			map[current.x][current.y-1] = ' ';
-                    	raft = true;
-            		}
-            		if(dirn==3 && map[current.x][current.y+1]=='T'){
-            			map[current.x+1][current.y] = ' ';
-                    	raft = true;
-            		}            	
+            	else if(lastMove=='C'&& map[infront.x][infront.y]=='T'){            		
+            			map[infront.x][infront.y] = ' ';
+                    	raft = true;            	     	
             	}
             	else if(lastMove == 'B'){
             		dynHeld--;
-            		if(dirn==0 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
-            			map[current.x][current.y+1] = ' ';
-                    	
-            		}
-            		if(dirn==1 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
-            			map[current.x-1][current.y] = ' ';
-                    	
-            		}
-            		if(dirn==2 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
-            			map[current.x][current.y-1] = ' ';
-                    	
-            		}
-            		if(dirn==3 && (map[current.x][current.y+1]=='T'|| map[current.x][current.y+1]=='-'|| map[current.x][current.y+1]=='*')){
-            			map[current.x+1][current.y] = ' ';
-                    	
-            		}   
+            		if((map[infront.x][infront.y]=='T'|| map[infront.x][infront.y]=='-'|| map[infront.x][infront.y]=='*')){
+            			map[infront.x][infront.y] = ' ';                    	
+            		}            		
             	            	}
-            	else if(lastMove == 'U'){
-            		if(dirn==0 && map[current.x][current.y+1]=='-'){
-            			map[current.x][current.y+1] = ' ';
-                    	
+            	else if(lastMove == 'U'&& map[infront.x][infront.y]=='-'){            		
+            			map[infront.x][infront.y] = ' ';                    	
             		}
-            		if(dirn==1 && map[current.x][current.y+1]=='-'){
-            			map[current.x-1][current.y] = ' ';
-                    	
-            		}
-            		if(dirn==2 && map[current.x][current.y+1]=='-'){
-            			map[current.x][current.y-1] = ' ';
-                    	
-            		}
-            		if(dirn==3 && map[current.x][current.y+1]=='-'){
-            			map[current.x+1][current.y] = ' ';
-                    	
-            		}   
-            	}
             	}
             
             action = agent.get_action( view );
