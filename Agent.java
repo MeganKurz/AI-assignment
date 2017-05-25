@@ -21,6 +21,8 @@ public class Agent {
 	static Position current = null;
 	static Position infront = null;
 	static Position treasure = null;
+	static Position seeKey = null;
+	static Position seeAxe = null;
 	static char lastMove = 0;
 
 	private static int dirn;
@@ -166,17 +168,16 @@ public class Agent {
 					for (i = 0; i < 5; i++) {
 						for (j = 0; j < 5; j++) {
 							map[75 + i][75 + j] = view[i][j];
-							if (view[i][j] == '$') {
-								treasure = new Position(i, j);
-							}
+							if (view[i][j] == '$')treasure = new Position(i, j);
+							if (view[i][j] == 'a')seeAxe = new Position(i, j);
+							if (view[i][j] == 'k')seeKey = new Position(i, j);
 						}
 					}
 					lefttop = new Position(75, 75);
 					righttop = new Position(75, 79);
 					leftbottom = new Position(79, 75);
 					rightbottom = new Position(79, 79);
-					map[77][77] = 'p';
-
+					
 				} else {
 					int[] dirAdd = getDirNum(dirn);
 					Position holder = null;
@@ -187,9 +188,9 @@ public class Agent {
 						if (dirn == 0 || dirn == 2) {
 							for (i = 0; i < 5; i++) {
 								map[x + (i*mult[0])][y + (mult[1])] = view[0][i];
-								if (view[0][i] == '$') {
-									treasure = new Position(x + (i*mult[0]), y + (1*mult[1]));
-								}
+								if (view[0][i] == '$') treasure = new Position(x + (i*mult[0]), y + (mult[1]));
+								if (view[0][i] == 'a') seeAxe = new Position(x + (i*mult[0]), y + (mult[1]));
+								if (view[0][i] == 'k') seeKey = new Position(x + (i*mult[0]), y + (mult[1]));
 							}
 							lefttop.setPosition(x, y + (mult[1]));
 							righttop.setPosition(x + (4*mult[0]), y + (mult[1]));
@@ -202,9 +203,10 @@ public class Agent {
 					else {
 							for (j = 0; j < 5; j++) {
 								map[x + (mult[0])][y + (j*mult[1])] = view[0][j];
-								if (view[0][j] == '$') {
-									treasure = new Position(x + (mult[0]), y + (j*mult[1]));
-								}
+								if (view[0][j] == '$') treasure = new Position(x + (mult[0]), y + (j*mult[1]));
+								if (view[0][j] == 'a') seeAxe = new Position(x + (mult[0]), y + (j*mult[1]));
+								if (view[0][j] == 'k') seeKey = new Position(x + (mult[0]), y + (j*mult[1]));
+								
 							}
 							lefttop.setPosition(x + (mult[0]), y);
 							righttop.setPosition(x + (mult[0]), y + (4*mult[1]));
