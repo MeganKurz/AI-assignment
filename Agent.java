@@ -71,6 +71,7 @@ public class Agent {
 			}
 
 	}
+		else action = 'F'; 
 		return action;
 	}
 
@@ -94,13 +95,13 @@ public class Agent {
 
 	void print_map(char map[][]) {
 		int i, j;
-
 		for (i = 0; i < 155; i++) {
 			System.out.print("|");
 			for (j = 0; j < 155; j++) {
 				if ((i == current.x) && (j == current.y)) {
 					System.out.print('^');
-				} else {
+				} 
+				else {
 					System.out.print(map[i][j]);
 				}
 			}
@@ -124,7 +125,6 @@ public class Agent {
 			for (int z = 0; z < 155; z++) {
 				map[k][z] = 0;
 			}
-
 		}
 
 		if (args.length < 2) {
@@ -157,7 +157,7 @@ public class Agent {
 					}
 				}
 				agent.print_view(view); // COMMENT THIS OUT BEFORE SUBMISSION
-				agent.print_map(map);
+				
 				
 				if (lastMove == 0) {
 					dirn = 1;
@@ -260,6 +260,7 @@ public class Agent {
 						rightbottom = righttop;
 						righttop = holder;
 						infront.setPosition(x+dirAdd[0], y+dirAdd[1]);
+						
 					} else if (lastMove == 'C' && map[infront.x][infront.y] == 'T') {
 						map[infront.x][infront.y] = ' ';
 						raft = true;
@@ -273,7 +274,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' ';
 					}
 				}
-
+				agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -290,7 +291,8 @@ public class Agent {
 			}
 		}
 	}
-
+	
+	//to get the block infront from th current position
 	public static int[] getDirNum(int dir) {
 		int[] results = new int[2];
 		if (dir == 0) {
