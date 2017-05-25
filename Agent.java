@@ -1,9 +1,3 @@
-
-/*  Agent.java  
- *  Sample Agent for Text-Based Adventure Game
- *  COMP3411 Artificial Intelligence
- *  UNSW Session 1, 2017
-*/
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -18,17 +12,9 @@ public class Agent {
 	static Position righttop = null;
 	static Position leftbottom = null;
 	static Position rightbottom = null;
-	static Position current = null;
-	static char lastMove = 0;
-	final static int EAST = 0;
-	final static int NORTH = 1;
-	final static int WEST = 2;
-	final static int SOUTH = 3;
-	private static int dirn;
-	private static char[][] map = new char[155][155];
 
+	private static char[][] map = new char[155][155];
 	boolean on_raft = false;
-	private Random random = new Random();
 
 	public char get_action(char view[][]) {
 		char action = 0;
@@ -46,7 +32,7 @@ public class Agent {
 		// action = 'B';
 		// dynHeld--;
 		// }
-		else if (ch == '-' && key) {
+		if (ch == '-' && key) {
 			action = 'U';
 		}
 		// if (ch == '-' && !(key) && dynHeld>=1){
@@ -57,18 +43,13 @@ public class Agent {
 		// action = 'B';
 		// dynHeld--;
 		// }
-		else if (ch == '~' && !raft) {
-			char[] commands = new char[] { 'L', 'R' };
-			action = commands[random.nextInt(commands.length)];
-		} else if (ch == ' ') {
-			char[] commands = new char[] { 'F', 'L', 'R' };
-			// 2 F's to put equal weight on moving forward and turning
-			action = commands[random.nextInt(commands.length)];
-
-		} else {
-			char[] commands = new char[] { 'L', 'R' };
-			action = commands[random.nextInt(commands.length)];
+		if (ch == '~' && raft) {
+			action = 'F';
 		}
+		if (ch == ' ') {
+			action = 'F';
+		} else
+			action = 'L';
 
 		return action;
 	}
@@ -101,6 +82,7 @@ public class Agent {
 		int port;
 		int ch;
 		int i, j;
+		char lastMove = 0;
 
 		if (args.length < 2) {
 			System.out.println("Usage: java Agent -p <port>\n");
@@ -132,138 +114,79 @@ public class Agent {
 					}
 				}
 				agent.print_view(view); // COMMENT THIS OUT BEFORE SUBMISSION
-				int[] additives = getDirNum(dirn);
-				int addx = additives[0];
-				int addy = additives[1];
 				if (lastMove == 0) {
-					dirn = 1;
-					current = new Position(77, 77);
 					for (i = 0; i < 5; i++) {
 						for (j = 0; j < 5; j++) {
 							map[75 + i][75 + j] = view[i][j];
-							if (view[i][j] == '$') {
-								Position gold = new Position(i, j);
-							}
 						}
 					}
 					lefttop = new Position(75, 75);
-					righttop = new Position(75, 79);
-					leftbottom = new Position(79, 75);
-					rightbottom = new Position(79, 79);
+					righttop = new Position(75, 80);
+					leftbottom = new Position(80, 75);
+					rightbottom = new Position(80, 80);
 					map[77][77] = 'p';
 					Position finish = new Position(77, 77);
 				} else {
 					Position holder = null;
-					if (lastMove == 'F') {
+					if (lastMove == 'f') {
 						int x = lefttop.x;
 						int y = lefttop.y;
-						if (dirn == 0) {
-							for (i = 0; i < 5; i++) {
-								map[x + i][y + 1] = view[0][i];
-								if (view[0][i] == '$') {
-									Position gold = new Position(x + i, y + 1);
-								}
+						for (j = 0; j < 5; j++) {
+							map[x + 1][y + j] = view[0][j];
+							if (view[0][j] == '$') {
+								Position gold = new Position(x + j, y + 1);
 							}
-							lefttop.setPosition(x, y + 1);
-							righttop.setPosition(x + 4, y + 1);
-							rightbottom.setPosition(x + 4, y - 3);
-							leftbottom.setPosition(x, y - 3);
-							current.setPosition(x + 2, y - 1);
-						} else if (dirn == 1) {
-							for (j = 0; j < 5; j++) {
-								map[x - 1][y + j] = view[0][j];
-								if (view[0][j] == '$') {
-									Position gold = new Position(x - 1, y + j);
-								}
-							}
-							lefttop.setPosition(x - 1, y);
-							righttop.setPosition(x - 1, y + 4);
-							rightbottom.setPosition(x + 3, y + 4);
-							leftbottom.setPosition(x + 3, y);
-							current.setPosition(x + 1, y + 2);
-						} else if (dirn == 2) {
-							for (i = 0; i < 5; i++) {
-								map[x - i][y - 1] = view[0][i];
-								if (view[0][i] == '$') {
-									Position gold = new Position(x - i, y - 1);
-								}
-							}
-							lefttop.setPosition(x, y - 1);
-							righttop.setPosition(x - 4, y - 1);
-							rightbottom.setPosition(x - 4, y + 3);
-							leftbottom.setPosition(x, y + 3);
-							current.setPosition(x - 2, y + 1);
-						} else if (dirn == 3) {
-							for (j = 0; j < 5; j++) {
-								map[x + 1][y - j] = view[0][j];
-								if (view[0][j] == '$') {
-									Position gold = new Position(x + 1, y - j);
-								}
-							}
-							lefttop.setPosition(x + 1, y);
-							righttop.setPosition(x + 1, y - 4);
-							rightbottom.setPosition(x - 3, y - 4);
-							leftbottom.setPosition(x - 3, y);
-							current.setPosition(x - 1, y - 2);
 						}
-
-						x = current.x;
-						y = current.y;
-						if (map[x][y] == 'k') {
-							map[x][y] = ' ';
+						if (map[x - 1][y + 2] == 'k') {
+							map[x - 1][y + 2] = ' ';
 							key = true;
 						}
-						if (map[x][y] == 'a') {
-							map[x][y] = ' ';
+						if (map[x - 1][y + 2] == 'a') {
+							map[x - 1][y + 2] = ' ';
 							axe = true;
 						}
-						if (map[x][y] == 'd') {
-							map[x][y] = ' ';
+						if (map[x - 1][y + 2] == 'd') {
+							map[x - 1][y + 2] = ' ';
 							dynHeld++;
 						}
-						if (map[x][y] == '$') {
-							map[x][y] = ' ';
+						if (map[x - 1][y + 2] == '$') {
+							map[x - 1][y + 2] = ' ';
 							gold = true;
 						}
-						if (map[x][y] == 'T' || map[x][y] == '-' || map[x][y] == '*') {
-							map[x][y] = ' ';
-						}
-						if (map[x][y] == ' ' && map[x][y] == '~') {
+						if (map[x - 1][y + 2] == ' ' && map[x - 2][y + 2] == '~') {
 							raft = false;
 						}
-
+						lefttop.setPosition(x + 1, y);
+						righttop.setPosition(x + 1, y);
 					} else if (lastMove == 'R') {
-						dirn = (dirn + 3) % 4;
 						holder = lefttop;
 						lefttop = righttop;
 						righttop = rightbottom;
 						rightbottom = leftbottom;
 						leftbottom = holder;
 					} else if (lastMove == 'L') {
-						dirn = (dirn + 1) % 4;
 						holder = lefttop;
 						lefttop = leftbottom;
 						leftbottom = rightbottom;
 						rightbottom = righttop;
 						righttop = holder;
-					} else if (lastMove == 'C' &&  map[current.x+addx][current.y+addy] == 'T') {
-						map[current.x + addx][current.y + addy] = ' ';
+					} else if (lastMove == 'C') {
+						map[lefttop.x - 1][lefttop.y + 2] = ' ';
 						raft = true;
-					} else if (lastMove == 'B' && ( map[current.x+addx][current.y+addy] == 'T'
-							|| map[current.x+addx][current.y+addy] == '-' ||  map[current.x+addx][current.y+addy] == '*')) {
-						dynHeld--;
-						map[current.x + addx][current.y + addy] = ' ';
-
-					} else if (lastMove == 'U' && map[current.x + addx][current.y + addy] == '-') {
-							map[current.x+addx][current.y+addy] = ' ';
-						}
+					} else if (lastMove == 'B') {
+						map[lefttop.x - 1][lefttop.y + 2] = ' ';
+					} else if (lastMove == 'U') {
+						map[lefttop.x - 1][lefttop.y + 2] = ' ';
+					}
 				}
 
 				action = agent.get_action(view);
 				lastMove = action;
 				out.write(action);
 			}
-		} catch (IOException e) {
+		} catch (
+
+		IOException e) {
 			System.out.println("Lost connection to port: " + port);
 			System.exit(-1);
 		} finally {
@@ -272,29 +195,6 @@ public class Agent {
 			} catch (IOException e) {
 			}
 		}
-	}
-
-
-	public static int[] getDirNum(int dir) {
-		int[] results = new int[2];
-		if (dir == 0) {
-			results[0] = 0;
-			results[1] = 1;
-
-		} else if (dir == 1) {
-			results[0] = -1;
-			results[1] = 0;
-
-		} else if (dir == 2) {
-			results[0] = 0;
-			results[1] = -1;
-
-		} else {
-			results[0] = 1;
-			results[1] = 0;
-
-		}
-		return results;
 	}
 }
 
