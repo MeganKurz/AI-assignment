@@ -183,62 +183,36 @@ public class Agent {
 					if (lastMove == 'F') {
 						int x = lefttop.x;
 						int y = lefttop.y;
-						if (dirn == 0) {
+						int[] mult = dirMult(dirn);
+						if (dirn == 0 || dirn == 2) {
 							for (i = 0; i < 5; i++) {
-								map[x + i][y + 1] = view[0][i];
+								map[x + (i*mult[0])][y + (mult[1])] = view[0][i];
 								if (view[0][i] == '$') {
-									treasure = new Position(x + i, y + 1);
+									treasure = new Position(x + (i*mult[0]), y + (1*mult[1]));
 								}
 							}
-							lefttop.setPosition(x, y + 1);
-							righttop.setPosition(x + 4, y + 1);
-							rightbottom.setPosition(x + 4, y - 3);
-							leftbottom.setPosition(x, y - 3);
-							current.setPosition(x + 2, y - 1);
-							infront.setPosition(x + 2, y);
+							lefttop.setPosition(x, y + (mult[1]));
+							righttop.setPosition(x + (4*mult[0]), y + (mult[1]));
+							rightbottom.setPosition(x + (4*mult[0]), y - (3*mult[1]));
+							leftbottom.setPosition(x, y - (3*mult[1]));
+							current.setPosition(x + (2*mult[0]), y - (mult[1]));
+							infront.setPosition(x + (2*mult[0]), y);
+							
 						}
-						else if (dirn == 1) {
+					else {
 							for (j = 0; j < 5; j++) {
-								map[x - 1][y + j] = view[0][j];
+								map[x + (mult[0])][y + (j*mult[1])] = view[0][j];
 								if (view[0][j] == '$') {
-									treasure = new Position(x - 1, y + j);
+									treasure = new Position(x + (mult[0]), y + (j*mult[1]));
 								}
 							}
-							lefttop.setPosition(x - 1, y);
-							righttop.setPosition(x - 1, y + 4);
-							rightbottom.setPosition(x + 3, y + 4);
-							leftbottom.setPosition(x + 3, y);
-							current.setPosition(x + 1, y + 2);
-							infront.setPosition(x, y + 2);
-						}
-						else if (dirn == 2) {
-							for (i = 0; i < 5; i++) {
-								map[x - i][y - 1] = view[0][i];
-								if (view[0][i] == '$') {
-							treasure = new Position(x - i, y - 1);
-								}
-							}
-							lefttop.setPosition(x, y - 1);
-							righttop.setPosition(x - 4, y - 1);
-							rightbottom.setPosition(x - 4, y + 3);
-							leftbottom.setPosition(x, y + 3);
-							current.setPosition(x - 2, y + 1);
-							infront.setPosition(x - 2, y);
-						}
-						else if (dirn == 3) {
-							for (j = 0; j < 5; j++) {
-								map[x + 1][y - j] = view[0][j];
-								if (view[0][j] == '$') {
-									treasure = new Position(x + 1, y - j);
-								}
-							}
-							lefttop.setPosition(x + 1, y);
-							righttop.setPosition(x + 1, y - 4);
-							rightbottom.setPosition(x - 3, y - 4);
-							leftbottom.setPosition(x - 3, y);
-							current.setPosition(x - 1, y - 2);
-							infront.setPosition(x, y - 2);
-						}
+							lefttop.setPosition(x + (mult[0]), y);
+							righttop.setPosition(x + (mult[0]), y + (4*mult[1]));
+							rightbottom.setPosition(x - (3*mult[0]), y + (4*mult[1]));
+							leftbottom.setPosition(x - (3*mult[0]), y);
+							current.setPosition(x - (mult[0]), y + (2*mult[1]));
+							infront.setPosition(x, y + (2*mult[1]));
+					}
 
 						x = current.x;
 						y = current.y;
@@ -338,6 +312,30 @@ public class Agent {
 		}
 		return results;
 	}
+	
+	
+	public static int[] dirMult(int dir){
+		int[] results = new int[2];
+		if(dir == 0){
+			results[0] = 1;
+			results[1] = 1;
+		}
+		else if(dir == 2){
+			results[0] = -1;
+			results[1] = -1;
+		}
+		else if(dir == 1){
+			results[0] = -1;
+			results[1] = 1;
+		}
+		else{
+			results[0] = 1;
+			results[1] = -1;
+		}
+		
+		return results;
+	}
+		
 
 }
 
