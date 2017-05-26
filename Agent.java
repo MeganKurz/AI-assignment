@@ -137,7 +137,7 @@ public class Agent {
 		// initialize the whole map with 0's
 		for (int k = 0; k < 155; k++) {
 			for (int z = 0; z < 155; z++) {
-				map[k][z] = 0;
+				map[k][z] = ',';
 			}
 		}
 
@@ -422,10 +422,12 @@ public class Agent {
 	 */
 	public static ArrayList<SearchTreeNode> getSuccessors(State currentSt) {
 		ArrayList<SearchTreeNode> successors = new ArrayList<SearchTreeNode>();
+		
 
 		for (Move mv : getLegalMoves(currentSt)) {
 			State tempState = updateCurrentSt(currentSt, mv.move);
-			SearchTreeNode S = new SearchTreeNode(currentSt, mv.move, mv.value);
+			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, mv.value);
+			successors.add(S);
 		}
 
 		return successors;
@@ -565,7 +567,6 @@ class Position {
 class SearchTree {
 	private SearchTreeNode root;
 	private int depth;
-	private int numOfMoves;
 	public int evaluation;
 	private ArrayList<SearchTreeNode> frontier = new ArrayList<>();
 
@@ -599,18 +600,12 @@ class SearchTree {
 		this.depth = tempDepth;
 	}
 
-	private void clearTree() {
-		depth = 0;
-		frontier.clear();
-		root.getChildren().clear();
-	} // end of clearTree
 	
     
     /**
-     * expandFrontier: Depending on if the depth is even or odd, add the successor SearchTreeNodes
-     * as friendly/enemy SearchTreeNodes. If we have an even depth, then we know we are evaluating our nodes
+     * expandFrontier: Add the successor SearchTreeNodes
      */
-    public void expandFrontier() {
+    public void searchMoves() {
         ArrayList<SearchTreeNode> newFrontier = new ArrayList<>();
         // See if we're at the very first root node
         if (depth != 0) {
