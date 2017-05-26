@@ -39,6 +39,37 @@ public class Agent {
 
 	boolean on_raft = false;
 	private Random random = new Random();
+	
+	public static boolean isValidMove(char ch, CurrentState cs){
+		boolean move = false;
+		int dynholder = cs.getDyn();
+		boolean raft = cs.getRaft();
+		boolean axe = cs.getAxe();
+		boolean key = cs.getKey();
+		
+		if (ch == 'T' && axe) {
+			move = true;
+		}
+		if (ch == '-' && key) {
+			move = true;
+		}
+		if (ch == 'T' && !(axe) && dynHeld>=1){
+		move = true;
+		}
+		if (ch == '-' && !(key) && dynHeld>=1){
+		move = true;
+		 }
+		if (ch == '*' && dynHeld>=1){
+		move = true;
+		}
+		if (ch == '~' && raft){
+			move = true;
+		}
+		if (ch == ' ' || ch == 'a'||ch == 'd' || ch == '$'|| ch == 'k'){
+			move = true;
+		}
+		return move;
+	}
 
 	public static boolean isValidMove(char map[][], int x, int y){
 		boolean move = false;
@@ -429,6 +460,38 @@ public class Agent {
 		
 		return results;
 	}
+	
+    /**
+     * getSuccessors: assigns all possible successor nodes to a given state, and returns an ArrayList with all of these
+     * SearchTreeNodes
+     * @param map: The map containing the current information about the map
+     * @param currentPos : current position in the map
+     * @param direction : current direction the agent is facing
+     * @return: an ArrayList storing SearchTreeNodes of all possible moves from a given state
+     */
+public static ArrayList<SearchTreeNode> getSuccessors(char[][] map, State currentSt) {
+        ArrayList<SearchTreeNode> successors = new ArrayList<SearchTreeNode>();
+
+			for(char ch : getLegalMoves(map,currentPos,direction)) {
+				Position newPos = setNewPosition(currentPos.x,currentPos.y,ch,direction);
+				int newDirection = setNewDirection(direction);
+				SearchTreeNode S = new SearchTreeNode(newPos, ch, 0, newDirection);
+			}
+			
+        return successors;
+    } // end of getSuccessors
+	
+public static ArrayList<Character> getLegalMoves(char[][] map, State currentSt){
+	char[] allUncheckedMoves = {'F', 'C', 'U', 'B'};
+	ArrayList<Character> validMoves = new ArrayList<>();
+	validMoves.add('L'); validMoves.add('R');
+	int[] add = getDirNum(currentSt.direction);
+	Position currentPos = currentSt.currentPos;
+	char infront = map[currentPos.x+add[0]][currentPos.y+add[1]];
+	
+	return validMoves;
+	
+}
 		
 }
 
@@ -451,5 +514,163 @@ class Position {
 	int compareY(Position p1, Position p2) {
 		int dif = p1.y - p2.y;
 		return dif;
+	}
+}
+
+class SearchTree {
+    private SearchTreeNode root;
+    private minDisHeur minDistH = new minDisHeur();
+    private int depth;
+    private int numOfMoves;
+    public int evaluation;
+    private ArrayList<SearchTreeNode> frontier = new ArrayList<>();
+
+    /**
+     * SearchTree constructor
+     * @param node: a SearchTreeNode to be added to the SearchTree
+     */
+    public SearchTree(SearchTreeNode node) {
+        this.root = node;
+        this.depth = 0;
+        this.evaluation = 0;
+    }
+
+    /**
+     * calculateDepth: calculates the depth we are to get SearchTreeNode children from
+     * Assigns our current depth in the SearchTree
+     */
+    public void calculateDepth() {
+        SearchTreeNode n = this.root;
+        int tempDepth = 0;
+        while (n != null) {
+            if (!n.getChildren().isEmpty()) {
+                n = n.getChildren().get(0);
+            } else {
+                break;
+            }
+            tempDepth++;
+        }
+        this.depth = tempDepth;
+    }
+
+  
+    private void clearTree() {
+        depth = 0;
+        frontier.clear();
+        root.getChildren().clear();
+    } // end of clearTree
+
+}
+
+class SearchTreeNode {
+    private int heuristicValue;
+    private ArrayList<SearchTreeNode> children = new ArrayList<SearchTreeNode>();
+    private char[][] board;
+
+    /**
+     * SearchTreeNode constructor
+     * @param board: an array that contains an image of the map
+     */
+    public SearchTreeNode(char[][] map) {
+        board = map;
+    }
+
+    /**
+     * SearchTreeNode constructor
+     * @param board: a GameRules object containing the current board state
+     * @param val: a heuristic evaluation value indicating how good of a move this SearchTreeNode is
+     */
+    public SearchTreeNode(char[][] map, int val) {
+        board = map;
+        heuristicValue = val;
+    }
+
+    /**
+     *
+     * @return: an ArrayList storing all of this SearchTreeNode's children
+     */
+    public ArrayList<SearchTreeNode> getChildren() {
+        return children;
+    }
+
+    /**
+     * setSuccessors: assigns children to a SearchTreeNode based off of the evaluation from the Heuristic function
+     * @param ourMove: a boolean indicating whether or not the move is ours
+     * @return: an ArrayList storing all of the good moves from the root SearchTreeNode
+     */
+    public ArrayList<SearchTreeNode> setSuccessors(boolean ourMove) {
+        ArrayList<SearchTreeNode> expanded = successorHeuristic.getSuccessors(gameRules);
+        for (SearchTreeNode S : expanded) {
+            children.add(S);
+        }
+        return children;
+    }
+
+    /**
+     *
+     * @return: the heuristicValue assigned to the SearchTreeNode
+     */
+    public int getValue() {
+        return heuristicValue;
+    }
+
+    /**
+     *
+     * @param V: sets the heuristicValue of a SearchTreeNode
+     */
+    public void setValue(int V) {
+        heuristicValue = V;
+    }
+
+} // end of SearchTreeNode
+
+class State{
+	Position currentPos;
+	int dynamiteHeld;
+	boolean axeHeld;
+	boolean keyHeld;
+	boolean goldHeld;
+	boolean raftHeld;
+	int direction;
+	
+	public State(Position currentPos, int dir){
+		this.currentPos = currentPos;
+		direction = dir;
+		dynamiteHeld = 0;
+		axeHeld = false;
+		keyHeld = false;
+		goldHeld = false;
+		raftHeld = false;
+	}
+	
+	public void setDyn(int x){
+		dynamiteHeld = dynamiteHeld+x;
+	}
+	public void setAxe(boolean y){
+		axeHeld = y;
+	}
+	public void setKey(boolean y){
+		keyHeld = y;
+	}
+	public void setRaft(boolean y){
+		raftHeld = y;
+	}
+	public void setGold(boolean y){
+		goldHeld = y;
+	}
+	public int getDyn(){
+		return dynamiteHeld;
+	}
+	public boolean getAxe(){
+		return axeHeld;
+	}
+	public boolean getKey(){
+		return keyHeld;
+	}
+	public boolean getGold(){
+		return goldHeld;
+	}
+	public boolean getRaft(){
+		return raftHeld;
 	}
 }
