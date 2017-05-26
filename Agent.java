@@ -40,14 +40,67 @@ public class Agent {
 	boolean on_raft = false;
 	private Random random = new Random();
 
+	public static boolean isValidMove(char map[][], int x, int y){
+		boolean move = false;
+		int dynholder = dynHeld;
+		char ch =  map[x][y];
+		
+		if (ch == 'T' && axe) {
+			move = true;
+		}
+		if (ch == '-' && key) {
+			move = true;
+		}
+		if (ch == 'T' && !(axe) && dynHeld>=1){
+		move = true;
+		}
+		if (ch == '-' && !(key) && dynHeld>=1){
+		move = true;
+		 }
+		if (ch == '*' && dynHeld>=1){
+		move = true;
+		}
+		if (ch == '~' && raft){
+			move = true;
+		}
+		if (ch == ' ' || ch == 'a'||ch == 'd' || ch == '$'|| ch == 'k'){
+			move = true;
+		}
+		return move;
+	}
+	
+	public boolean reachGoal(char map[][], int x, int y, int xg, int yg){
+		boolean reachable = false;
+		map[x][y]
+		
+		return reachable; 
+	}
+	
+	
 	public char get_action(char map[][]) {
 		char action = 0;
 		char ch = 0;
 		ch = map[infront.x][infront.y];
+		//weights for moves
+		int $ = 100;
+		int k = 10;
+		int a = 10;
+		int F = -1;
+		int L = -3;
+		int R = -3;
+		int uknown = 5;
 
 		// while agent hasn't found the treasure randomly walk around
 		if(treasure == null) {
-
+			//plan best rout 
+			/* if(seeKey != null){
+				//go to key
+			}
+			if(seeAxe != null){
+				//go to axe
+			}
+			*/
+			
 			if (ch == 'T' && axe) {
 				action = 'C';
 			}
@@ -66,8 +119,9 @@ public class Agent {
 			else if ((ch == '~' && !raft)||ch == '.') {
 				char[] commands = new char[] { 'L', 'R' };
 				action = commands[random.nextInt(commands.length)];
-			} else if (ch == ' ') {
-				char[] commands = new char[] { 'F', 'L', 'R' };
+			} 
+			else if (ch == ' ') {
+				char[] commands = new char[] { 'F', 'L', 'R', 'F', 'F', 'F' };
 				// 2 F's to put equal weight on moving forward and turning
 				action = commands[random.nextInt(commands.length)];
 
@@ -128,7 +182,7 @@ public class Agent {
 	//initialize the whole map with 0's
 		for (int k = 0; k < 155; k++) {
 			for (int z = 0; z < 155; z++) {
-				map[k][z] = 0;
+				map[k][z] = ',';
 			}
 		}
 
@@ -311,7 +365,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; //open the door
 					}
 				}
-				agent.print_map(map);
+				//agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
