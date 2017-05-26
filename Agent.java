@@ -61,6 +61,8 @@ public class Agent {
 		}
 		return move;
 	}
+	
+	
 
 	public char get_action(char map[][]) {
 		char action = 0;
@@ -686,10 +688,29 @@ class SearchTreeNode {
 	 */
 	public int getValue() {
 		return heuristicValue;
+	}	
+	
+	private static int[] arr;
+	private static int maxSum = 0;
+	public static void bestPath(SearchTreeNode root, int[] path, int index, int sum) {
+		
+		if (null == root) {
+			return;
+		}
+		path[index++] = root.getValue();
+		sum += root.getValue();
+		if (root.getChildren()==null) {
+			if (sum > maxSum) {
+				maxSum = sum;
+				arr = Arrays.copyOf(path, index);
+			}
+			return;
+		}
+		for(int i; i < root.getChildren().size(); i++){
+		bestPath(root.getChildren().get(i), path, index, sum);
+		}
+		return;
 	}
-
-} // end of SearchTreeNode
-
 class State {
 	char[][] stateMap = new char[155][155];
 	Position currentPos;
