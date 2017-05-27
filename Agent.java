@@ -55,9 +55,9 @@ public class Agent {
 			move = true;
 		} else if (ch == 'U' && key && space == '-') {
 			move = true;
-		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || ch == '*') && dynHeld >= 1 && ch == 'B') {
+		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || space == '*') && dynHeld >= 1 && ch == 'B') {
 			move = true;
-		} else if (space == '~' && raft && ch == 'f') {
+		} else if (space == '~' && raft && ch == 'F') {
 			move = true;
 		} else if ((space == ' ' || space == 'a' || space == 'd' || space == '$' || space == 'k') && ch == 'F') {
 			move = true;
@@ -70,26 +70,6 @@ public class Agent {
 		char ch = 0;
 		ch = map[infront.x][infront.y];
 
-		// while agent hasn't found the treasure randomly walk around
-		/*
-		 * if(treasure == null) {
-		 * 
-		 * if (ch == 'T' && axe) { action = 'C'; } // if (ch == 'T' && !(axe) &&
-		 * dynHeld>=1){ // action = 'B'; // } else if (ch == '-' && key) {
-		 * action = 'U'; } // if (ch == '-' && !(key) && dynHeld>=1){ // action
-		 * = 'B'; // } // if (ch == '*' && dynHeld>=1){ // action = 'B'; // }
-		 * else if ((ch == '~' && !raft)||ch == '.') { char[] commands = new
-		 * char[] { 'L', 'R' }; action =
-		 * commands[random.nextInt(commands.length)]; } else if (ch == ' ') {
-		 * char[] commands = new char[] { 'F', 'L', 'R' }; // 2 F's to put equal
-		 * weight on moving forward and turning action =
-		 * commands[random.nextInt(commands.length)];
-		 * 
-		 * } else { char[] commands = new char[] { 'L', 'R' }; action =
-		 * commands[random.nextInt(commands.length)]; }
-		 * 
-		 * } else action = 'F';
-		 */
 		if (arr.isEmpty()) {
 			State currentSt = new State(current, dirn, map, dynHeld, axe, key, gold, raft);
 			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
@@ -99,6 +79,7 @@ public class Agent {
 			maxSum = Integer.MIN_VALUE;
 			action = arr.remove(0);
 		} else {
+			System.out.println(arr.toString());
 			action = arr.remove(0);
 		}
 
@@ -145,11 +126,11 @@ public class Agent {
 		Socket socket = null;
 		Agent agent = new Agent();
 		char view[][] = new char[5][5];
-		char action = 'F';
+		char action;
 		int port;
 		int ch;
 		int i, j;
-		// initialize the whole map with 0's
+		// initialize the whole map with ,'s
 		for (int k = 0; k < 155; k++) {
 			for (int z = 0; z < 155; z++) {
 				map[k][z] = ',';
@@ -200,13 +181,14 @@ public class Agent {
 							// if agent sees the key, treasure of axe note its
 							// position in the map
 							if (view[i][j] == '$')
-								treasure = new Position(i, j);
+								treasure = new Position(75+i, 75+j);
 							if (view[i][j] == 'a')
-								seeAxe = new Position(i, j);
+								seeAxe = new Position(75+i, 75+j);
 							if (view[i][j] == 'k')
-								seeKey = new Position(i, j);
+								seeKey = new Position(75+i, 75+j);
 						}
-					} // the initial corners of the view (facing north)
+					} 
+					// the initial corners of the view (facing north)
 					lefttop = new Position(75, 75);
 					righttop = new Position(75, 79);
 					leftbottom = new Position(79, 75);
@@ -214,15 +196,16 @@ public class Agent {
 
 					// if the agent has made a move ie action
 				} else {
+					int[] mult = dirMult(dirn);
 					int[] dirAdd = getDirNum(dirn);
-					Position holder = null;
+					Position holder=null;
 					// if the agents last move was forward
 					if (lastMove == 'F') {
 						int x = lefttop.x; // the left top corner (of the 5x5
 											// view) in relation to the map
 						int y = lefttop.y; // in relation to the direction of
 											// the last move that was made
-						int[] mult = dirMult(dirn);
+						
 
 						// if the agent is facing east or west
 						if (dirn == 0 || dirn == 2) {
@@ -360,7 +343,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				// agent.print_map(map);
+				agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -410,12 +393,12 @@ public class Agent {
 		if (dir == 0) {
 			results[0] = 1;
 			results[1] = 1;
-		} else if (dir == 2) {
-			results[0] = -1;
-			results[1] = -1;
 		} else if (dir == 1) {
 			results[0] = -1;
 			results[1] = 1;
+		} else if (dir == 2) {
+			results[0] = -1;
+			results[1] = -1;
 		} else {
 			results[0] = 1;
 			results[1] = -1;
@@ -429,7 +412,8 @@ public class Agent {
 			path.add(root.moveDone);
 		}
 		sum += root.getValue();
-		if (root.getChildren() == null) {
+		
+		if (root.getChildren().isEmpty()) {
 			if (sum > maxSum) {
 				maxSum = sum;
 				arr = cloneList(path);
