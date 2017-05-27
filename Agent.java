@@ -40,9 +40,10 @@ public class Agent {
 
 	boolean on_raft = false;
 	private Random random = new Random();
-	
+
 	static int maxSum = 0;
 	static ArrayList<Character> arr;
+	static ArrayList<Character> path;
 
 	public static boolean isValidMove(char space, State cs, char ch) {
 		boolean move = false;
@@ -90,18 +91,18 @@ public class Agent {
 		 * 
 		 * } else action = 'F';
 		 */
-		State currentSt = new State(current, dirn, map, dynHeld, axe, key, gold, raft);
-		SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
-		moveTree.searchMoves();
-		ArrayList<Character> start = new ArrayList<Character>();
-		ArrayList<Character> path = bestPath(moveTree.root, start, 0, 0);
-		maxSum = 0;
-		
-		
-		
-		
-		
-		
+		if (path.isEmpty()) {
+			State currentSt = new State(current, dirn, map, dynHeld, axe, key, gold, raft);
+			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
+			moveTree.searchMoves();
+			ArrayList<Character> start = new ArrayList<Character>();
+			path = bestPath(moveTree.root, start, 0, 0);
+			maxSum = 0;
+			action = path.remove(0);
+		} else {
+			action = path.remove(0);
+		}
+
 		return action;
 	}
 
@@ -424,7 +425,6 @@ public class Agent {
 		return results;
 	}
 
-
 	public static ArrayList<Character> bestPath(SearchTreeNode root, ArrayList<Character> path, int index, int sum) {
 		if (null == root) {
 		}
@@ -441,11 +441,11 @@ public class Agent {
 		}
 		return arr;
 	}
-	
-	public static ArrayList<Character> cloneList(ArrayList<Character> list){
+
+	public static ArrayList<Character> cloneList(ArrayList<Character> list) {
 		ArrayList<Character> clone = new ArrayList<Character>();
-		for(char c : list)
-		    clone.add(c);
+		for (char c : list)
+			clone.add(c);
 		return clone;
 	}
 
@@ -745,7 +745,6 @@ class SearchTreeNode {
 	public int getValue() {
 		return heuristicValue;
 	}
-
 
 } // end of SearchTreeNode
 
