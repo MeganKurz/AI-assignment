@@ -360,7 +360,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				//agent.print_map(map);
+				// agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -425,8 +425,8 @@ public class Agent {
 	}
 
 	public static void bestPath(SearchTreeNode root, ArrayList<Character> path, int sum) {
-		if(root.moveDone != 0){
-		path.add(root.moveDone);
+		if (root.moveDone != 0) {
+			path.add(root.moveDone);
 		}
 		sum += root.getValue();
 		if (root.getChildren() == null) {
@@ -434,12 +434,13 @@ public class Agent {
 				maxSum = sum;
 				arr = cloneList(path);
 			}
+			return;
+		} else {
+			for (int i = 0; i < root.getChildren().size(); i++) {
+				bestPath(root.getChildren().get(i), path, sum);
+			}
 		}
-		else{
-		for (int i = 0; i < root.getChildren().size(); i++) {
-			bestPath(root.getChildren().get(i), path, sum);
-		}
-		}
+		return;
 	}
 
 	public static ArrayList<Character> cloneList(ArrayList<Character> list) {
@@ -448,29 +449,6 @@ public class Agent {
 			clone.add(c);
 		return clone;
 	}
-
-	/**
-	 * getSuccessors: assigns all possible successor nodes to a given state, and
-	 * returns an ArrayList with all of these SearchTreeNodes
-	 * 
-	 * @param map
-	 *            : The map containing the current information about the map
-	 * @param currentSt
-	 *            : The current state of the agent
-	 * @return: an ArrayList storing SearchTreeNodes of all possible moves from
-	 *          a given state
-	 */
-	public static ArrayList<SearchTreeNode> getSuccessors(State currentSt) {
-		ArrayList<SearchTreeNode> successors = new ArrayList<SearchTreeNode>();
-
-		for (Move mv : getLegalMoves(currentSt)) {
-			State tempState = updateCurrentSt(currentSt, mv.move);
-			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, mv.value);
-			successors.add(S);
-		}
-
-		return successors;
-	} // end of getSuccessors
 
 	public static State updateCurrentSt(State currentSt, char move) {
 		State newState = State.cloneState(currentSt);
@@ -646,34 +624,31 @@ class SearchTree {
 	public void searchMoves() {
 		ArrayList<SearchTreeNode> newFrontier = new ArrayList<>();
 		// See if we're at the very first root node
-		if (depth != 0) {
-			boolean end = false;
-			while (!end) {
-				for (SearchTreeNode S : frontier) {
-					int x = S.agentSt.currentPos.x;
-					int y = S.agentSt.currentPos.y;
-					int[] add = Agent.getDirNum(S.agentSt.direction);
-					char in = S.agentSt.stateMap[x + add[0]][y + add[1]];
-					if (in == ',' || in == '.' || S.getValue() >= 5) {
-						end = true;
-					} else {
-						newFrontier.addAll(S.setSuccessors());
-					}
+		newFrontier.addAll(root.setSuccessors());
+		frontier.clear();
+		for (SearchTreeNode S : newFrontier) {
+			frontier.add(S);
+		}
+		depth++;
+
+		boolean end = false;
+		while (!end) {
+			for (SearchTreeNode S : frontier) {
+				int x = S.agentSt.currentPos.x;
+				int y = S.agentSt.currentPos.y;
+				int[] add = Agent.getDirNum(S.agentSt.direction);
+				char in = S.agentSt.stateMap[x + add[0]][y + add[1]];
+				if (in == ',' || in == '.' || S.getValue() >= 5) {
+					end = true;
+				} else {
+					newFrontier.addAll(S.setSuccessors());
 				}
-				frontier.clear();
-				for (SearchTreeNode N : newFrontier) {
-					frontier.add(N);
-				}
-				depth++;
 			}
-		} else {
-			newFrontier.addAll(root.setSuccessors());
 			frontier.clear();
-			for (SearchTreeNode S : newFrontier) {
-				frontier.add(S);
+			for (SearchTreeNode N : newFrontier) {
+				frontier.add(N);
 			}
 			depth++;
-
 		}
 	}
 }
@@ -733,13 +708,37 @@ class SearchTreeNode {
 	 *          SearchTreeNode
 	 */
 	public ArrayList<SearchTreeNode> setSuccessors() {
-		ArrayList<SearchTreeNode> expanded = Agent.getSuccessors(agentSt);
+		ArrayList<SearchTreeNode> expanded = getSuccessors(agentSt);
 		for (SearchTreeNode S : expanded) {
 			children.add(S);
 		}
 		return children;
 	}
+	
+	/**
+	 * getSuccessors: assigns all possible successor nodes to a given state, and
+	 * returns an ArrayList with all of these SearchTreeNodes
+	 * 
+	 * @param map
+	 *            : The map containing the current information about the map
+	 * @param currentSt
+	 *            : The current state of the agent
+	 * @return: an ArrayList storing SearchTreeNodes of all possible moves from
+	 *          a given state
+	 */
+	public static ArrayList<SearchTreeNode> getSuccessors(State currentSt) {
+		ArrayList<SearchTreeNode> successors = new ArrayList<SearchTreeNode>();
 
+		for (Move mv : Agent.getLegalMoves(currentSt)) {
+			State tempState = Agent.updateCurrentSt(currentSt, mv.move);
+			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, mv.value);
+			successors.add(S);
+		}
+
+		return successors;
+	} // end of getSuccessors
+	
+	
 	/**
 	 *
 	 * @return: the heuristicValue assigned to the SearchTreeNode
