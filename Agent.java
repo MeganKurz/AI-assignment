@@ -654,10 +654,10 @@ class SearchTree {
 					int y = S.agentSt.currentPos.y;
 					int[] add = Agent.getDirNum(S.agentSt.direction);
 					char in = S.agentSt.stateMap[x + add[0]][y + add[1]];
-					if (in != ',' || in != '.') {
-						newFrontier.addAll(S.setSuccessors());
-					} else {
+					if (in == ',' || in == '.' || S.getValue() >= 5) {
 						end = true;
+					} else {
+						newFrontier.addAll(S.setSuccessors());
 					}
 				}
 				frontier.clear();
