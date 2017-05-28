@@ -38,8 +38,7 @@ public class Agent {
 	// the whole map, where the views will be stored in
 	private static char[][] map = new char[155][155];
 
-	boolean on_raft = false;
-	private Random random = new Random();
+	
 
 	static int maxSum = Integer.MIN_VALUE;
 	static ArrayList<Character> arr = new ArrayList<Character>();
@@ -68,6 +67,7 @@ public class Agent {
 	public char get_action(char map[][]) {
 		char action = 0;
 		char ch = 0;
+		
 		ch = map[infront.x][infront.y];
 
 		if (arr.isEmpty()) {
@@ -75,7 +75,7 @@ public class Agent {
 			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
 			moveTree.searchMoves();
 
-			moveTree.root.print();
+			//moveTree.root.print();
 
 			ArrayList<Character> start = new ArrayList<Character>();
 			bestPath(moveTree.root, start, 0);
@@ -111,7 +111,7 @@ public class Agent {
 	void print_map(char map[][]) {
 		int i, j;
 		for (i = 0; i < 155; i++) {
-			System.out.print("|");
+			System.out.print('|');
 			for (j = 0; j < 155; j++) {
 				if ((i == current.x) && (j == current.y)) {
 					System.out.print('^');
@@ -119,7 +119,7 @@ public class Agent {
 					System.out.print(map[i][j]);
 				}
 			}
-			System.out.println("|");
+			System.out.println('|');
 		}
 
 	}
@@ -192,6 +192,7 @@ public class Agent {
 								seeKey = new Position(75+i, 75+j);
 						}
 					} 
+					map[77][77]=' ';
 					// the initial corners of the view (facing north)
 					lefttop = new Position(75, 75);
 					righttop = new Position(75, 79);
@@ -205,6 +206,7 @@ public class Agent {
 					Position holder=null;
 					// if the agents last move was forward
 					if (lastMove == 'F') {
+						
 						int x = lefttop.x; // the left top corner (of the 5x5
 											// view) in relation to the map
 						int y = lefttop.y; // in relation to the direction of
@@ -275,25 +277,25 @@ public class Agent {
 						if (map[x][y] == 'k') {
 							map[x][y] = ' ';
 							key = true;
-						} else if (map[x][y] == 'a') {
+						} if (map[x][y] == 'a') {
 							map[x][y] = ' ';
 							axe = true;
-						} else if (map[x][y] == 'd') {
+						} if (map[x][y] == 'd') {
 							map[x][y] = ' ';
 							dynHeld++;
-						} else if (map[x][y] == '$') {
+						} if (map[x][y] == '$') {
 							map[x][y] = ' ';
 							gold = true;
 						}
 						// if the agent is where a wall, door, or tree was make
 						// that spot empty now
-						else if (map[x][y] == 'T' || map[x][y] == '-' || map[x][y] == '*') {
+						if (map[x][y] == 'T' || map[x][y] == '-' || map[x][y] == '*') {
 							map[x][y] = ' ';
 						}
 						// if the agent was on water and now on land take the
 						// raft away
 
-						else if ((map[x][y] !='~')&& map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
+						if ((map[x][y] !='~')&& map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 
 							raft = false;
 						}
@@ -353,7 +355,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				//agent.print_map(map);
+				agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -418,6 +420,7 @@ public class Agent {
 	}
 
 	public static void bestPath(SearchTreeNode root, ArrayList<Character> path, int sum) {
+		
 		if (root.moveDone != 0) {
 			path.add(root.moveDone);
 		}
