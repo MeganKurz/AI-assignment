@@ -469,9 +469,11 @@ public class Agent {
 		if (move == 'R') {
 			// change the direction the agent is facing
 			newState.direction = (oldDir + 3) % 4;
+			dirAdd = getDirNum(newState.direction);
 		} else if (move == 'L') {
 			// change the direction the agent is facing
 			newState.direction = (oldDir + 1) % 4;
+			dirAdd = getDirNum(newState.direction);
 		} else if (move == 'F') {
 			newState.currentPos = new Position(x, y);
 
