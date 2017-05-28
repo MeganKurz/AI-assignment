@@ -1,4 +1,3 @@
-
 /*  Agent.java  
  *  Sample Agent for Text-Based Adventure Game
  *  COMP3411 Artificial Intelligence
@@ -38,8 +37,6 @@ public class Agent {
 	// the whole map, where the views will be stored in
 	private static char[][] map = new char[155][155];
 
-	
-
 	static int maxSum = Integer.MIN_VALUE;
 	static SearchTreeNode bestEndNode;
 	static LinkedList<Character> moves = new LinkedList<Character>();
@@ -55,11 +52,14 @@ public class Agent {
 			move = true;
 		} else if (ch == 'U' && key && space == '-') {
 			move = true;
-		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || space == '*') && dynHeld >= 1 && ch == 'B') {
+		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || space == '*')
+				&& dynHeld >= 1 && ch == 'B') {
 			move = true;
 		} else if (space == '~' && raft && ch == 'F') {
 			move = true;
-		} else if ((space == ' ' || space == 'a' || space == 'd' || space == '$' || space == 'k') && ch == 'F') {
+		} else if ((space == ' ' || space == 'a' || space == 'd'
+				|| space == '$' || space == 'k')
+				&& ch == 'F') {
 			move = true;
 		}
 		return move;
@@ -68,15 +68,16 @@ public class Agent {
 	public char get_action(char map[][]) {
 		char action = 0;
 		char ch = 0;
-		
+
 		ch = map[infront.x][infront.y];
 
 		if (moves.size() == 0) {
-			State currentSt = new State(current, dirn, map, dynHeld, axe, key, gold, raft);
+			State currentSt = new State(current, dirn, map, dynHeld, axe, key,
+					gold, raft);
 			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
 			moveTree.searchMoves();
 
-			//moveTree.root.print();
+			// moveTree.root.print();
 			bestEnd(moveTree.root);
 			moves = getRoute(bestEndNode, moveTree.root);
 
@@ -162,8 +163,8 @@ public class Agent {
 
 		try { // scan 5-by-5 window around current location
 			while (true) {
-				for (i = 0; i < 5; i++) {
-					for (j = 0; j < 5; j++) {
+				for (int i = 0; i < 5; i++) {
+					for (int j = 0; j < 5; j++) {
 						if (!((i == 2) && (j == 2))) {
 							ch = in.read();
 							if (ch == -1) {
@@ -182,20 +183,20 @@ public class Agent {
 					current = new Position(77, 77); // start the agent in the
 													// center of the 155x155 map
 					infront = new Position(76, 77);
-					for (i = 0; i < 5; i++) {
-						for (j = 0; j < 5; j++) {
+					for (int i = 0; i < 5; i++) {
+						for (int j = 0; j < 5; j++) {
 							map[75 + i][75 + j] = view[i][j];
 							// if agent sees the key, treasure of axe note its
 							// position in the map
 							if (view[i][j] == '$')
-								treasure = new Position(75+i, 75+j);
+								treasure = new Position(75 + i, 75 + j);
 							if (view[i][j] == 'a')
-								seeAxe = new Position(75+i, 75+j);
+								seeAxe = new Position(75 + i, 75 + j);
 							if (view[i][j] == 'k')
-								seeKey = new Position(75+i, 75+j);
+								seeKey = new Position(75 + i, 75 + j);
 						}
-					} 
-					map[77][77]=' ';
+					}
+					map[77][77] = 'P';
 					// the initial corners of the view (facing north)
 					lefttop = new Position(75, 75);
 					righttop = new Position(75, 79);
@@ -206,19 +207,18 @@ public class Agent {
 				} else {
 					int[] mult = dirMult(dirn);
 					int[] dirAdd = getDirNum(dirn);
-					Position holder=null;
+					Position holder = null;
 					// if the agents last move was forward
 					if (lastMove == 'F') {
-						
+
 						int x = lefttop.x; // the left top corner (of the 5x5
 											// view) in relation to the map
 						int y = lefttop.y; // in relation to the direction of
 											// the last move that was made
-						
 
 						// if the agent is facing east or west
 						if (dirn == 0 || dirn == 2) {
-							for (i = 0; i < 5; i++) {
+							for (int i = 0; i < 5; i++) {
 								// load the new view into the map
 								map[x + (i * mult[0])][y + (mult[1])] = view[0][i];
 								// if the new view has a key, axe or treasure
@@ -245,7 +245,7 @@ public class Agent {
 
 						// if the agent is facing north or south
 						else {
-							for (j = 0; j < 5; j++) {
+							for (int j = 0; j < 5; j++) {
 								// load the new view into the map
 								map[x + (mult[0])][y + (j * mult[1])] = view[0][j];
 								// if the new view has a key, axe or treasure
@@ -280,13 +280,16 @@ public class Agent {
 						if (map[x][y] == 'k') {
 							map[x][y] = ' ';
 							key = true;
-						} if (map[x][y] == 'a') {
+						}
+						if (map[x][y] == 'a') {
 							map[x][y] = ' ';
 							axe = true;
-						} if (map[x][y] == 'd') {
+						}
+						if (map[x][y] == 'd') {
 							map[x][y] = ' ';
 							dynHeld++;
-						} if (map[x][y] == '$') {
+						}
+						if (map[x][y] == '$') {
 							map[x][y] = ' ';
 							gold = true;
 						}
@@ -298,9 +301,7 @@ public class Agent {
 						// if the agent was on water and now on land take the
 						// raft away
 
-
-						if ((map[x][y] !='~')&& map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
-
+						if ((map[x][y] != '~') && map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 							raft = false;
 						}
 
@@ -310,6 +311,7 @@ public class Agent {
 						int y = current.y;
 						dirn = (dirn + 3) % 4; // change the direction the agent
 												// is facing
+						dirAdd = getDirNum(dirn);
 						// switch the corners of the 5x5 view to the new
 						// direction in the map
 						holder = lefttop;
@@ -326,6 +328,7 @@ public class Agent {
 						int y = current.y;
 						dirn = (dirn + 1) % 4; // change the direction the agent
 												// is facing
+						dirAdd = getDirNum(dirn);
 						// switch the corners of the 5x5 view to the new
 						// direction in the map
 						holder = lefttop;
@@ -337,7 +340,8 @@ public class Agent {
 						infront.setPosition(x + dirAdd[0], y + dirAdd[1]);
 
 						// if the agents last move was to cut down a tree
-					} else if (lastMove == 'C' && map[infront.x][infront.y] == 'T') {
+					} else if (lastMove == 'C'
+							&& map[infront.x][infront.y] == 'T') {
 						map[infront.x][infront.y] = ' ';
 						raft = true; // the agent has a raft now
 
@@ -346,19 +350,20 @@ public class Agent {
 						dynHeld--;
 						// if there was a wall, door, or tree get rid of it
 
-
-						if (map[infront.x][infront.y] == 'T' || map[infront.x][infront.y] == '-'
+						if (map[infront.x][infront.y] == 'T'
+								|| map[infront.x][infront.y] == '-'
 								|| map[infront.x][infront.y] == '*') {
 
 							map[infront.x][infront.y] = ' ';
 						}
 
 						// if the agents last move was to unlock a door
-					} else if (lastMove == 'U' && map[infront.x][infront.y] == '-') {
+					} else if (lastMove == 'U'
+							&& map[infront.x][infront.y] == '-') {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				//agent.print_map(map);
+				// agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -428,7 +433,7 @@ public class Agent {
 			if (root.getValue() > maxSum) {
 				maxSum = root.getValue();
 				bestEndNode = root;
-				
+
 			}
 		} else {
 			for (int i = 0; i < root.getChildren().size(); i++) {
@@ -436,10 +441,11 @@ public class Agent {
 			}
 		}
 	}
-	
-	public LinkedList<Character> getRoute(SearchTreeNode node, SearchTreeNode root){
+
+	public LinkedList<Character> getRoute(SearchTreeNode node,
+			SearchTreeNode root) {
 		LinkedList<Character> moveDone = new LinkedList<Character>();
-		while(node != root){
+		while (node != root) {
 			moveDone.addFirst(node.moveDone);
 			node = node.parent;
 		}
@@ -489,8 +495,8 @@ public class Agent {
 			}
 			// if the agent was on water and now on land take the raft away
 
-			else if (newState.stateMap[x][y] !='~' && newState.stateMap[x - dirAdd[0]][y - dirAdd[1]] == '~') {
-
+			else if (newState.stateMap[x][y] != '~'
+					&& newState.stateMap[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 
 				newState.setRaft(false);
 			}
@@ -519,7 +525,8 @@ public class Agent {
 		ArrayList<Move> validMoves = new ArrayList<>();
 		int[] add = getDirNum(currentSt.direction);
 		Position currentPos = currentSt.currentPos;
-		char infront = currentSt.stateMap[currentPos.x + add[0]][currentPos.y + add[1]];
+		char infront = currentSt.stateMap[currentPos.x + add[0]][currentPos.y
+				+ add[1]];
 		Move left = new Move('L', -2);
 		Move right = new Move('R', -2);
 		validMoves.add(left);
@@ -538,11 +545,9 @@ public class Agent {
 		int value = 0;
 		if (move == 'C' ^ move == 'U') {
 			value = 10;
-		}
-		else if (move == 'B') {
+		} else if (move == 'B') {
 			value = 0;
-		} 
-		else if(move == 'F') {
+		} else if (move == 'F') {
 			if (infront == 'k') {
 				value = 30;
 			} else if (infront == '$') {
@@ -701,8 +706,8 @@ class SearchTreeNode {
 	public ArrayList<SearchTreeNode> getChildren() {
 		return children;
 	}
-	
-	public void setParent(SearchTreeNode node){
+
+	public void setParent(SearchTreeNode node) {
 		this.parent = node;
 	}
 
@@ -722,7 +727,7 @@ class SearchTreeNode {
 		}
 		return children;
 	}
-	
+
 	/**
 	 * getSuccessors: assigns all possible successor nodes to a given state, and
 	 * returns an ArrayList with all of these SearchTreeNodes
@@ -739,15 +744,15 @@ class SearchTreeNode {
 
 		for (Move mv : Agent.getLegalMoves(currentSt)) {
 			State tempState = Agent.updateCurrentSt(currentSt, mv.move);
-			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, (mv.value+this.heuristicValue));
+			SearchTreeNode S = new SearchTreeNode(tempState, mv.move,
+					(mv.value + this.heuristicValue));
 			S.setParent(this);
 			successors.add(S);
 		}
 
 		return successors;
 	} // end of getSuccessors
-	
-	
+
 	/**
 	 *
 	 * @return: the heuristicValue assigned to the SearchTreeNode
@@ -755,38 +760,38 @@ class SearchTreeNode {
 	public int getValue() {
 		return heuristicValue;
 	}
-	
-    public void print() {
-        print("", true);
-    }
 
-    private void print(String prefix, boolean isTail) {
-        System.out.println(prefix + (isTail ? "|__ " : "|-- ") + this.moveDone + " " + this.heuristicValue);
-        for (int i = 0; i < children.size() - 1; i++) {
-            children.get(i).print(prefix + (isTail ? "    " : "|   "), false);
-        }
-        if (children.size() > 0) {
-            children.get(children.size() - 1)
-                    .print(prefix + (isTail ?"    " : "|   "), true);
-        }
-    }
+	public void print() {
+		print("", true);
+	}
 
-	
-    public void print() {
-        print("", true);
-    }
+	private void print(String prefix, boolean isTail) {
+		System.out.println(prefix + (isTail ? "|__ " : "|-- ") + this.moveDone
+				+ " " + this.heuristicValue);
+		for (int i = 0; i < children.size() - 1; i++) {
+			children.get(i).print(prefix + (isTail ? "    " : "|   "), false);
+		}
+		if (children.size() > 0) {
+			children.get(children.size() - 1).print(
+					prefix + (isTail ? "    " : "|   "), true);
+		}
+	}
 
-    private void print(String prefix, boolean isTail) {
-        System.out.println(prefix + (isTail ? "|__ " : "|-- ") + this.moveDone + " " + this.heuristicValue);
-        for (int i = 0; i < children.size() - 1; i++) {
-            children.get(i).print(prefix + (isTail ? "    " : "|   "), false);
-        }
-        if (children.size() > 0) {
-            children.get(children.size() - 1)
-                    .print(prefix + (isTail ?"    " : "|   "), true);
-        }
-    }
+	public void print() {
+		print("", true);
+	}
 
+	private void print(String prefix, boolean isTail) {
+		System.out.println(prefix + (isTail ? "|__ " : "|-- ") + this.moveDone
+				+ " " + this.heuristicValue);
+		for (int i = 0; i < children.size() - 1; i++) {
+			children.get(i).print(prefix + (isTail ? "    " : "|   "), false);
+		}
+		if (children.size() > 0) {
+			children.get(children.size() - 1).print(
+					prefix + (isTail ? "    " : "|   "), true);
+		}
+	}
 
 } // end of SearchTreeNode
 
@@ -811,7 +816,8 @@ class State {
 		raftHeld = false;
 	}
 
-	public State(Position currentPos, int dir, char[][] origMap, int dyn, boolean a, boolean k, boolean g, boolean r) {
+	public State(Position currentPos, int dir, char[][] origMap, int dyn,
+			boolean a, boolean k, boolean g, boolean r) {
 		stateMap = cloneMap(origMap);
 		this.currentPos = currentPos;
 		direction = dir;
@@ -873,8 +879,8 @@ class State {
 
 	public static State cloneState(State st) {
 		Position ps = new Position(st.currentPos.x, st.currentPos.y);
-		State newS = new State(ps, st.direction, st.stateMap, st.getDyn(), st.getAxe(), st.getKey(), st.getGold(),
-				st.getRaft());
+		State newS = new State(ps, st.direction, st.stateMap, st.getDyn(),
+				st.getAxe(), st.getKey(), st.getGold(), st.getRaft());
 		return newS;
 	}
 
