@@ -137,7 +137,7 @@ public class Agent {
 		// initialize the whole map with ,'s
 		for (int k = 0; k < 155; k++) {
 			for (int z = 0; z < 155; z++) {
-				map[k][z] = 'l';
+				map[k][z] = ',';
 			}
 		}
 
