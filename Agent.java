@@ -494,10 +494,8 @@ public class Agent {
 				newState.setGold(true);
 			}
 			// if the agent was on water and now on land take the raft away
-
 			else if (newState.stateMap[x][y] != '~'
 					&& newState.stateMap[x - dirAdd[0]][y - dirAdd[1]] == '~') {
-
 				newState.setRaft(false);
 			}
 		}
@@ -525,8 +523,7 @@ public class Agent {
 		ArrayList<Move> validMoves = new ArrayList<>();
 		int[] add = getDirNum(currentSt.direction);
 		Position currentPos = currentSt.currentPos;
-		char infront = currentSt.stateMap[currentPos.x + add[0]][currentPos.y
-				+ add[1]];
+		char infront = currentSt.stateMap[currentPos.x + add[0]][currentPos.y + add[1]];
 		Move left = new Move('L', -2);
 		Move right = new Move('R', -2);
 		validMoves.add(left);
@@ -545,9 +542,11 @@ public class Agent {
 		int value = 0;
 		if (move == 'C' ^ move == 'U') {
 			value = 10;
-		} else if (move == 'B') {
-			value = 0;
-		} else if (move == 'F') {
+		} else if (move == 'B' && infront =='*') {
+			value = -5;
+		}else if (move == 'B' && (infront == 'T' ^ infront == '-')) {
+			value = -10;
+		}else if (move == 'F') {
 			if (infront == 'k') {
 				value = 30;
 			} else if (infront == '$') {
@@ -556,7 +555,9 @@ public class Agent {
 				value = 30;
 			} else if (infront == 'd') {
 				value = 40;
-			} else {
+			}else if (infront == 'P' && gold) {
+				value = 100;
+			}else {
 				value = -1;
 			}
 		}
