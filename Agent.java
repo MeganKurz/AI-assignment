@@ -42,7 +42,8 @@ public class Agent {
 	private Random random = new Random();
 
 	static int maxSum = Integer.MIN_VALUE;
-	static ArrayList<Character> arr = new ArrayList<Character>();
+	static SearchTreeNode bestEndNode;
+	static LinkedList<Character> moves = new LinkedList<Character>();
 
 	public static boolean isValidMove(char space, State cs, char ch) {
 		boolean move = false;
@@ -70,17 +71,21 @@ public class Agent {
 		char ch = 0;
 		ch = map[infront.x][infront.y];
 
-		if (arr.isEmpty()) {
+		if (moves.size() == 0) {
 			State currentSt = new State(current, dirn, map, dynHeld, axe, key, gold, raft);
 			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
 			moveTree.searchMoves();
-			ArrayList<Character> start = new ArrayList<Character>();
-			bestPath(moveTree.root, start, 0);
+			//moveTree.root.print();
+			bestEnd(moveTree.root);
+			moves = getRoute(bestEndNode, moveTree.root);
 			maxSum = Integer.MIN_VALUE;
-			action = arr.remove(0);
+			System.out.println(bestEndNode.heuristicValue + "x");
+			System.out.println(moves.toString() + "y");
+			action = moves.remove();
 		} else {
-			System.out.println(arr.toString());
-			action = arr.remove(0);
+			action = moves.remove();
+			System.out.println(moves.toString());
+
 		}
 
 		return action;
@@ -129,11 +134,11 @@ public class Agent {
 		char action;
 		int port;
 		int ch;
-		//int i, j;
+		int i, j;
 		// initialize the whole map with ,'s
 		for (int k = 0; k < 155; k++) {
 			for (int z = 0; z < 155; z++) {
-				map[k][z] = 'l';
+				map[k][z] = ',';
 			}
 		}
 
@@ -155,8 +160,8 @@ public class Agent {
 
 		try { // scan 5-by-5 window around current location
 			while (true) {
-				for (int i = 0; i < 5; i++) {
-					for (int j = 0; j < 5; j++) {
+				for (i = 0; i < 5; i++) {
+					for (j = 0; j < 5; j++) {
 						if (!((i == 2) && (j == 2))) {
 							ch = in.read();
 							if (ch == -1) {
@@ -175,8 +180,8 @@ public class Agent {
 					current = new Position(77, 77); // start the agent in the
 													// center of the 155x155 map
 					infront = new Position(76, 77);
-					for (int i = 0; i < 5; i++) {
-						for (int j = 0; j < 5; j++) {
+					for (i = 0; i < 5; i++) {
+						for (j = 0; j < 5; j++) {
 							map[75 + i][75 + j] = view[i][j];
 							// if agent sees the key, treasure of axe note its
 							// position in the map
@@ -209,7 +214,7 @@ public class Agent {
 
 						// if the agent is facing east or west
 						if (dirn == 0 || dirn == 2) {
-							for (int i = 0; i < 5; i++) {
+							for (i = 0; i < 5; i++) {
 								// load the new view into the map
 								map[x + (i * mult[0])][y + (mult[1])] = view[0][i];
 								// if the new view has a key, axe or treasure
@@ -236,7 +241,7 @@ public class Agent {
 
 						// if the agent is facing north or south
 						else {
-							for (int j = 0; j < 5; j++) {
+							for (j = 0; j < 5; j++) {
 								// load the new view into the map
 								map[x + (mult[0])][y + (j * mult[1])] = view[0][j];
 								// if the new view has a key, axe or treasure
@@ -288,7 +293,7 @@ public class Agent {
 						}
 						// if the agent was on water and now on land take the
 						// raft away
-						else if ((map[x][y] !='~')&& map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
+						else if (map[x][y] == ' ' && map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 							raft = false;
 						}
 
@@ -298,7 +303,6 @@ public class Agent {
 						int y = current.y;
 						dirn = (dirn + 3) % 4; // change the direction the agent
 												// is facing
-						dirAdd = getDirNum(dirn);
 						// switch the corners of the 5x5 view to the new
 						// direction in the map
 						holder = lefttop;
@@ -315,7 +319,6 @@ public class Agent {
 						int y = current.y;
 						dirn = (dirn + 1) % 4; // change the direction the agent
 												// is facing
-						dirAdd = getDirNum(dirn);
 						// switch the corners of the 5x5 view to the new
 						// direction in the map
 						holder = lefttop;
@@ -335,8 +338,8 @@ public class Agent {
 					} else if (lastMove == 'B' && dynHeld > 0) {
 						dynHeld--;
 						// if there was a wall, door, or tree get rid of it
-						if (map[infront.x][infront.y] == 'T' || map[infront.x][infront.y] == '-'
-								|| map[infront.x][infront.y] == '*') {
+						if ((map[infront.x][infront.y] == 'T' || map[infront.x][infront.y] == '-'
+								|| map[infront.x][infront.y] == '*')) {
 							map[infront.x][infront.y] = ' ';
 						}
 
@@ -345,7 +348,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				agent.print_map(map);
+				//agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -409,24 +412,27 @@ public class Agent {
 		return results;
 	}
 
-	public static void bestPath(SearchTreeNode root, ArrayList<Character> path, int sum) {
-		if (root.moveDone != 0) {
-			path.add(root.moveDone);
-		}
-		sum += root.getValue();
-		
+	public static void bestEnd(SearchTreeNode root) {
 		if (root.getChildren().isEmpty()) {
-			if (sum > maxSum) {
-				maxSum = sum;
-				arr = cloneList(path);
+			if (root.getValue() > maxSum) {
+				maxSum = root.getValue();
+				bestEndNode = root;
+				
 			}
-			return;
 		} else {
 			for (int i = 0; i < root.getChildren().size(); i++) {
-				bestPath(root.getChildren().get(i), path, sum);
+				bestEnd(root.getChildren().get(i));
 			}
 		}
-		return;
+	}
+	
+	public LinkedList<Character> getRoute(SearchTreeNode node, SearchTreeNode root){
+		LinkedList<Character> moveDone = new LinkedList<Character>();
+		while(node != root){
+			moveDone.addFirst(node.moveDone);
+			node = node.parent;
+		}
+		return moveDone;
 	}
 
 	public static ArrayList<Character> cloneList(ArrayList<Character> list) {
@@ -471,7 +477,7 @@ public class Agent {
 				newState.setGold(true);
 			}
 			// if the agent was on water and now on land take the raft away
-			else if (newState.stateMap[x][y] !='~' && newState.stateMap[x - dirAdd[0]][y - dirAdd[1]] == '~') {
+			else if (newState.stateMap[x][y] == ' ' && newState.stateMap[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 				newState.setRaft(false);
 			}
 		}
@@ -500,8 +506,8 @@ public class Agent {
 		int[] add = getDirNum(currentSt.direction);
 		Position currentPos = currentSt.currentPos;
 		char infront = currentSt.stateMap[currentPos.x + add[0]][currentPos.y + add[1]];
-		Move left = new Move('L', getValue('L', infront));
-		Move right = new Move('R', getValue('R', infront));
+		Move left = new Move('L', -2);
+		Move right = new Move('R', -2);
 		validMoves.add(left);
 		validMoves.add(right);
 		for (int i = 0; i < moves.length; i++) {
@@ -516,15 +522,13 @@ public class Agent {
 
 	public static int getValue(char move, char infront) {
 		int value = 0;
-		if (move == 'R' || move == 'L') {
-			value = -2;
-		}
-		if (move == 'C' || move == 'U') {
+		if (move == 'C' ^ move == 'U') {
 			value = 10;
 		}
-		if (move == 'B') {
+		else if (move == 'B') {
 			value = 0;
-		} else {
+		} 
+		else if(move == 'F') {
 			if (infront == 'k') {
 				value = 30;
 			} else if (infront == '$') {
@@ -571,7 +575,6 @@ class Position {
 class SearchTree {
 	SearchTreeNode root;
 	private int depth;
-	public int evaluation;
 	private ArrayList<SearchTreeNode> frontier = new ArrayList<>();
 
 	/**
@@ -583,7 +586,6 @@ class SearchTree {
 	public SearchTree(SearchTreeNode node) {
 		this.root = node;
 		this.depth = 0;
-		this.evaluation = 0;
 	}
 
 	/**
@@ -619,6 +621,7 @@ class SearchTree {
 
 		boolean end = false;
 		while (!end) {
+			newFrontier.clear();
 			for (SearchTreeNode S : frontier) {
 				int x = S.agentSt.currentPos.x;
 				int y = S.agentSt.currentPos.y;
@@ -641,6 +644,7 @@ class SearchTree {
 
 class SearchTreeNode {
 	int heuristicValue;
+	SearchTreeNode parent;
 	private ArrayList<SearchTreeNode> children = new ArrayList<SearchTreeNode>();
 	State agentSt;
 	char moveDone;
@@ -683,6 +687,10 @@ class SearchTreeNode {
 	public ArrayList<SearchTreeNode> getChildren() {
 		return children;
 	}
+	
+	public void setParent(SearchTreeNode node){
+		this.parent = node;
+	}
 
 	/**
 	 * setSuccessors: assigns children to a SearchTreeNode based off of the
@@ -712,12 +720,13 @@ class SearchTreeNode {
 	 * @return: an ArrayList storing SearchTreeNodes of all possible moves from
 	 *          a given state
 	 */
-	public static ArrayList<SearchTreeNode> getSuccessors(State currentSt) {
+	public ArrayList<SearchTreeNode> getSuccessors(State currentSt) {
 		ArrayList<SearchTreeNode> successors = new ArrayList<SearchTreeNode>();
 
 		for (Move mv : Agent.getLegalMoves(currentSt)) {
 			State tempState = Agent.updateCurrentSt(currentSt, mv.move);
-			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, mv.value);
+			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, (mv.value+this.heuristicValue));
+			S.setParent(this);
 			successors.add(S);
 		}
 
@@ -732,6 +741,21 @@ class SearchTreeNode {
 	public int getValue() {
 		return heuristicValue;
 	}
+	
+    public void print() {
+        print("", true);
+    }
+
+    private void print(String prefix, boolean isTail) {
+        System.out.println(prefix + (isTail ? "|__ " : "|-- ") + this.moveDone + " " + this.heuristicValue);
+        for (int i = 0; i < children.size() - 1; i++) {
+            children.get(i).print(prefix + (isTail ? "    " : "|   "), false);
+        }
+        if (children.size() > 0) {
+            children.get(children.size() - 1)
+                    .print(prefix + (isTail ?"    " : "|   "), true);
+        }
+    }
 
 } // end of SearchTreeNode
 
