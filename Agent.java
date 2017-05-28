@@ -55,8 +55,7 @@ public class Agent {
 			move = true;
 		} else if (ch == 'U' && key && space == '-') {
 			move = true;
-		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || space == '*') && dynHeld >= 1
-				&& ch == 'B') {
+		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || (space == '*')) && dynHeld > 0	&& ch == 'B') {
 			move = true;
 		} else if (space == '~' && raft && ch == 'F') {
 			move = true;
@@ -122,9 +121,9 @@ public class Agent {
 
 	void print_map(char map[][]) {
 		int i, j;
-		for (i = 0; i < 155; i++) {
+		for (i = 0; i < 99; i++) {
 			System.out.print('|');
-			for (j = 0; j < 155; j++) {
+			for (j = 0; j < 99; j++) {
 				if ((i == current.x) && (j == current.y)) {
 					System.out.print('^');
 				} else {
@@ -214,6 +213,7 @@ public class Agent {
 
 					// if the agent has made a move ie action
 				} else {
+					map[49][49] = 'p';
 					int[] mult = dirMult(dirn);
 					int[] dirAdd = getDirNum(dirn);
 					Position holder = null;
@@ -371,7 +371,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				// agent.print_map(map);
+				//agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -513,9 +513,11 @@ public class Agent {
 		if (move == 'R') {
 			// change the direction the agent is facing
 			newState.direction = (oldDir + 3) % 4;
+			dirAdd = getDirNum(newState.direction);
 		} else if (move == 'L') {
 			// change the direction the agent is facing
 			newState.direction = (oldDir + 1) % 4;
+			dirAdd = getDirNum(newState.direction);
 		} else if (move == 'F') {
 			newState.currentPos = new Position(x, y);
 
@@ -537,14 +539,12 @@ public class Agent {
 			else if (map[x][y] != '~' && map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 				newState.setRaft(false);
 			}
-		}
-
-		else if (move == 'C') {
+		}else if (move == 'C') {
 			// the agent has a raft now
 			newState.setRaft(true);
 
 			// if the agents last move was to use some dynamite
-		} else if (move == 'B') {
+		}else if (move == 'B') {
 			newState.setDyn(newState.getDyn() - 1);
 
 			// if the agents last move was to unlock a door
@@ -564,8 +564,8 @@ public class Agent {
 		int[] add = getDirNum(currentSt.direction);
 		Position currentPos = currentSt.currentPos;
 		char infront = map[currentPos.x + add[0]][currentPos.y + add[1]];
-		Move left = new Move('L', -3);
-		Move right = new Move('R', -3);
+		Move left = new Move('L', -2);
+		Move right = new Move('R', -2);
 		validMoves.add(left);
 		validMoves.add(right);
 		for (int i = 0; i < moves.length; i++) {
@@ -590,22 +590,22 @@ public class Agent {
 		if (move == 'C' ^ move == 'U') {
 			value = 10;
 		} else if (move == 'B' && infront == '*') {
-			value = -5;
+			value = -3;
 		} else if (move == 'B' && (infront == 'T' ^ infront == '-')) {
 			value = -10;
 		} else if (move == 'F') {
 			if (infront == 'k') {
-				value = 50;
+				value = 70;
 			} else if (infront == '$') {
-				value = 100;
+				value = 200;
 			} else if (infront == 'a') {
-				value = 50;
+				value = 70;
 			} else if (infront == 'd') {
-				value = 60;
+				value = 80;
 			} else if (infront == 'p' && gold) {
-				value = 100;
+				value = 400;
 			} else {
-				value = -2;
+				value = -1;
 			}
 		}
 		return value;
@@ -701,7 +701,7 @@ class SearchTree {
 				int y = S.agentSt.currentPos.y;
 				int[] add = Agent.getDirNum(S.agentSt.direction);
 				char in = Agent.map[x + add[0]][y + add[1]];
-				if (in == ',' || in == '.' || S.getValue() >= 10 || depth == 20) {
+				if (in == ',' || in == '.' || S.getIndivValue() >= 0 || depth == 16) {
 					end = true;
 				} else {
 					newFrontier.addAll(S.setSuccessors());
@@ -717,6 +717,7 @@ class SearchTree {
 }
 
 class SearchTreeNode {
+	int indivValue;
 	int heuristicValue;
 	SearchTreeNode parent;
 	private ArrayList<SearchTreeNode> children = new ArrayList<SearchTreeNode>();
@@ -748,10 +749,11 @@ class SearchTreeNode {
 	 * @param mv
 	 *            : the move done to bring the parent State to the current state
 	 */
-	public SearchTreeNode(State st, char mv, int val) {
+	public SearchTreeNode(State st, char mv, int val, int ind) {
 		agentSt = State.cloneState(st);
 		heuristicValue = val;
 		moveDone = mv;
+		indivValue=ind;
 	}
 
 	/**
@@ -799,42 +801,11 @@ class SearchTreeNode {
 
 		for (Move mv : Agent.getLegalMoves(currentSt)) {
 			State tempState = Agent.updateCurrentSt(currentSt, mv.move);
-			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, (mv.value + this.heuristicValue));
+			SearchTreeNode S = new SearchTreeNode(tempState, mv.move, (mv.value + this.heuristicValue), mv.value);
 			S.setParent(this);
 			if ((this.moveDone == 'L' && S.moveDone == 'R') ^ (this.moveDone == 'R' && S.moveDone == 'L')) {
 			} else {
-				/*if (Agent.lastSeenDyn != null) {
-					if (tempState.currentPos.compare(Agent.lastSeenDyn) < currentSt.currentPos
-							.compare(Agent.lastSeenDyn)) {
-						S.heuristicValue = S.heuristicValue + 1;
-					}
-				}
 				
-				if (!tempState.axeHeld && Agent.seeAxe != null) {
-					if (tempState.currentPos.compare(Agent.seeAxe) < currentSt.currentPos.compare(Agent.seeAxe)) {
-						S.heuristicValue = S.heuristicValue + 1;
-					}
-
-				}
-				if (!tempState.keyHeld && Agent.seeKey != null) {
-					if (tempState.currentPos.compare(Agent.seeKey) < currentSt.currentPos.compare(Agent.seeKey)) {
-						S.heuristicValue = S.heuristicValue + 1;
-					}
-
-				}
-				if (!tempState.goldHeld && Agent.treasure != null) {
-					if (tempState.currentPos.compare(Agent.treasure) < currentSt.currentPos.compare(Agent.treasure)) {
-						S.heuristicValue = S.heuristicValue + 1;
-					}
-
-				}
-				if (tempState.goldHeld) {
-					if (tempState.currentPos.compare(Agent.home) < currentSt.currentPos.compare(Agent.home)) {
-						S.heuristicValue = S.heuristicValue + 1;
-					}
-
-				}
-				*/
 				
 				successors.add(S);
 			}
@@ -849,6 +820,9 @@ class SearchTreeNode {
 	 */
 	public int getValue() {
 		return heuristicValue;
+	}
+	public int getIndivValue() {
+		return indivValue;
 	}
 
 	public void print() {
