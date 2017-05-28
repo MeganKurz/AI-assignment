@@ -77,17 +77,17 @@ public class Agent {
 			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
 			moveTree.searchMoves();
 
-			// moveTree.root.print();
+			moveTree.root.print();
 			bestEnd(moveTree.root);
 			moves = getRoute(bestEndNode, moveTree.root);
 
 			maxSum = Integer.MIN_VALUE;
-			System.out.println(bestEndNode.heuristicValue + "x");
-			System.out.println(moves.toString() + "y");
+			//System.out.println(bestEndNode.heuristicValue + "x");
+			//System.out.println(moves.toString() + "y");
 			action = moves.remove();
 		} else {
 			action = moves.remove();
-			System.out.println(moves.toString());
+			//System.out.println(moves.toString());
 
 		}
 
@@ -550,13 +550,13 @@ public class Agent {
 			value = -10;
 		}else if (move == 'F') {
 			if (infront == 'k') {
-				value = 30;
+				value = 50;
 			} else if (infront == '$') {
 				value = 100;
 			} else if (infront == 'a') {
-				value = 30;
+				value = 50;
 			} else if (infront == 'd') {
-				value = 40;
+				value = 60;
 			}else if (infront == 'P' && gold) {
 				value = 100;
 			}else {
@@ -649,7 +649,7 @@ class SearchTree {
 				int y = S.agentSt.currentPos.y;
 				int[] add = Agent.getDirNum(S.agentSt.direction);
 				char in = S.agentSt.stateMap[x + add[0]][y + add[1]];
-				if (in == ',' || in == '.' || S.getValue() >= 5) {
+				if (in == ',' || in == '.' || S.getValue() >= 5 || depth == 8) {
 					end = true;
 				} else {
 					newFrontier.addAll(S.setSuccessors());
@@ -750,7 +750,11 @@ class SearchTreeNode {
 			SearchTreeNode S = new SearchTreeNode(tempState, mv.move,
 					(mv.value + this.heuristicValue));
 			S.setParent(this);
+			if((this.moveDone =='L' && S.moveDone =='R')^(this.moveDone =='R' && S.moveDone =='L')){	
+			}
+			else{
 			successors.add(S);
+			}
 		}
 
 		return successors;
