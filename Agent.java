@@ -3,11 +3,33 @@
  *  Sample Agent for Text-Based Adventure Game
  *  COMP3411 Artificial Intelligence
  *  UNSW Session 1, 2017
+ *  
+ *  
  */
 import java.util.*;
 import java.io.*;
 import java.net.*;
 
+
+/*
+ * Our solution uses a Search Tree and a similar algorithm to A* Star search except our goal is the highest cost/points.
+ *  We use a search tree to find all legal moves and when a maximum depth is reached, the end of the map, unknown territory 
+ *  or a position with a valuable item the search tree ends.
+ *  We then find the leaf in the search tree with the highest value and complete that path (root to leaf of moves).
+ *  By storing all the moves from the root to the leaf in a linked list and then pulling them out.
+ *  We store each view in a map building onto it every time the agent moves forward (taking into account the direction it is facing)
+ *  so the agent has knowledge of the surrounding areas and we also store certain positions to help us navigate.
+ *  The map with the Position class keeps the direction of the agent accounted for.
+ *  The data structures we use are a 2D array for the map, as well as LinkedLists to store the found moves. A tree where the nodes have arrayList 
+ *  to store that nodes children in.
+ *  We add some extra classes known as Position and Move to store the x,y locations and the value and character of the move respectively.
+ *  The decisions we made along the way was to implement an algorithm that started off by making optimal moves even when the goal/gold was not in sight.
+ *  This was done by assigning a value to every possible move (finding the gold being the highest value, then once the gold is found going back to 
+ *  the initial state being the new highest value)- We thought this was optimal as the agent is never just randomly walking around, but always heading to some 
+ *  goal be that a key dynamite an axe the unknown and so forth. 
+ *  We also shrunk the map to clear space, as well as removed the option for repetitive moves (R then L or L then R) that make no progress.
+ *  
+ */
 public class Agent {
 	static int dynHeld = 0;
 	static boolean key = false;
@@ -44,6 +66,16 @@ public class Agent {
 	static SearchTreeNode bestEndNode;
 	static LinkedList<Character> moves = new LinkedList<Character>();
 
+	/**
+	 * @param space:
+	 *            the space infront of the current agents state
+	 * @param cs:
+	 *            the current state of the agent
+	 * @param ch:
+	 *            the character move being evaluated
+	 * @return: true if the move in question is valid, false otherwise
+	 */
+
 	public static boolean isValidMove(char space, State cs, char ch) {
 		boolean move = false;
 		int dynHeld = cs.getDyn();
@@ -55,7 +87,8 @@ public class Agent {
 			move = true;
 		} else if (ch == 'U' && key && space == '-') {
 			move = true;
-		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || (space == '*')) && dynHeld > 0	&& ch == 'B') {
+		} else if (((space == 'T' && !(axe)) || (space == '-' && !(key)) || (space == '*')) && dynHeld > 0
+				&& ch == 'B') {
 			move = true;
 		} else if (space == '~' && raft && ch == 'F') {
 			move = true;
@@ -65,6 +98,13 @@ public class Agent {
 		}
 		return move;
 	}
+
+	/**
+	 * @param map:
+	 *            the current map
+	 * @return: the chosen action from the either created or old list of actions
+	 *          ready to be executed
+	 */
 
 	public char get_action(char map[][]) {
 		char action = 0;
@@ -119,6 +159,13 @@ public class Agent {
 		System.out.println("+-----+");
 	}
 
+	/**
+	 * Prints the map
+	 * 
+	 * @param map:
+	 *            the map
+	 * 
+	 */
 	void print_map(char map[][]) {
 		int i, j;
 		for (i = 0; i < 99; i++) {
@@ -181,7 +228,7 @@ public class Agent {
 						}
 					}
 				}
-				agent.print_view(view); // COMMENT THIS OUT BEFORE SUBMISSION
+				// agent.print_view(view); // COMMENT THIS OUT BEFORE SUBMISSION
 
 				// if the agent is in its starting position ie the agent hasnt
 				// moved yet
@@ -371,7 +418,7 @@ public class Agent {
 						map[infront.x][infront.y] = ' '; // open the door
 					}
 				}
-				//agent.print_map(map);
+				// agent.print_map(map);
 				action = agent.get_action(map);
 				lastMove = action;
 				out.write(action);
@@ -452,7 +499,10 @@ public class Agent {
 	 * @param root:
 	 *            the node to be looked at to find the children
 	 */
-
+	// Searches through the tree created from the root node for the best end
+	// node/leaf.
+	// The best leaf/node is decided by it's value which is assigned by what
+	// move was made and where that move leads
 	public static void bestEnd(SearchTreeNode root) {
 
 		if (root.getChildren().isEmpty()) {
@@ -475,6 +525,8 @@ public class Agent {
 	 *            the node that includes the last move
 	 * @return: the list of moves to follow the best route
 	 */
+	// finds the route/parents from the best node found up until the root to
+	// determine what moves to make to reach the best node
 	public LinkedList<Character> getRoute(SearchTreeNode node, SearchTreeNode root) {
 		LinkedList<Character> moveDone = new LinkedList<Character>();
 		while (node != root) {
@@ -489,6 +541,7 @@ public class Agent {
 	 *            the list that wants to be copied
 	 * @return: the cloned list
 	 */
+	//clones the list
 	public static ArrayList<Character> cloneList(ArrayList<Character> list) {
 		ArrayList<Character> clone = new ArrayList<Character>();
 		for (char c : list)
@@ -539,12 +592,12 @@ public class Agent {
 			else if (map[x][y] != '~' && map[x - dirAdd[0]][y - dirAdd[1]] == '~') {
 				newState.setRaft(false);
 			}
-		}else if (move == 'C') {
+		} else if (move == 'C') {
 			// the agent has a raft now
 			newState.setRaft(true);
 
 			// if the agents last move was to use some dynamite
-		}else if (move == 'B') {
+		} else if (move == 'B') {
 			newState.setDyn(newState.getDyn() - 1);
 
 			// if the agents last move was to unlock a door
@@ -558,6 +611,7 @@ public class Agent {
 	 *            the current state the agent is in
 	 * @return: the list of legal moves
 	 */
+	//finds the legal moves from a current state
 	public static ArrayList<Move> getLegalMoves(State currentSt) {
 		char[] moves = { 'F', 'C', 'U', 'B' };
 		ArrayList<Move> validMoves = new ArrayList<>();
@@ -753,7 +807,7 @@ class SearchTreeNode {
 		agentSt = State.cloneState(st);
 		heuristicValue = val;
 		moveDone = mv;
-		indivValue=ind;
+		indivValue = ind;
 	}
 
 	/**
@@ -805,8 +859,7 @@ class SearchTreeNode {
 			S.setParent(this);
 			if ((this.moveDone == 'L' && S.moveDone == 'R') ^ (this.moveDone == 'R' && S.moveDone == 'L')) {
 			} else {
-				
-				
+
 				successors.add(S);
 			}
 		}
@@ -821,6 +874,7 @@ class SearchTreeNode {
 	public int getValue() {
 		return heuristicValue;
 	}
+
 	public int getIndivValue() {
 		return indivValue;
 	}
@@ -910,11 +964,9 @@ class State {
 		return raftHeld;
 	}
 
-
 	public static State cloneState(State st) {
 		Position ps = new Position(st.currentPos.x, st.currentPos.y);
-		State newS = new State(ps, st.direction, st.getDyn(), st.getAxe(), st.getKey(), st.getGold(),
-				st.getRaft());
+		State newS = new State(ps, st.direction, st.getDyn(), st.getAxe(), st.getKey(), st.getGold(), st.getRaft());
 		return newS;
 	}
 
