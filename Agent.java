@@ -35,7 +35,7 @@ public class Agent {
 	// WEST = 2;
 	// SOUTH = 3;
 	// the whole map, where the views will be stored in
-	private static char[][] map = new char[155][155];
+	private static char[][] map = new char[99][99];
 
 	static int maxSum = Integer.MIN_VALUE;
 	static SearchTreeNode bestEndNode;
@@ -58,7 +58,7 @@ public class Agent {
 		} else if (space == '~' && raft && ch == 'F') {
 			move = true;
 		} else if ((space == ' ' || space == 'a' || space == 'd'
-				|| space == '$' || space == 'k')
+				|| space == '$' || space == 'k' || space ==  'p')
 				&& ch == 'F') {
 			move = true;
 		}
@@ -77,7 +77,7 @@ public class Agent {
 			SearchTree moveTree = new SearchTree(new SearchTreeNode(currentSt));
 			moveTree.searchMoves();
 
-			moveTree.root.print();
+			//moveTree.root.print();
 			bestEnd(moveTree.root);
 			moves = getRoute(bestEndNode, moveTree.root);
 
@@ -139,8 +139,8 @@ public class Agent {
 		int ch;
 
 		// initialize the whole map with ,'s
-		for (int k = 0; k < 155; k++) {
-			for (int z = 0; z < 155; z++) {
+		for (int k = 0; k < 99; k++) {
+			for (int z = 0; z < 99; z++) {
 				map[k][z] = ',';
 			}
 		}
@@ -180,28 +180,29 @@ public class Agent {
 				// moved yet
 				if (lastMove == 0) {
 					dirn = 1; // let his starting position be north
-					current = new Position(77, 77); // start the agent in the
-													// center of the 155x155 map
-					infront = new Position(76, 77);
+					current = new Position(49, 49); // start the agent in the
+					// center of the 155x155 map
+					
+					infront = new Position(48, 49);
 					for (int i = 0; i < 5; i++) {
 						for (int j = 0; j < 5; j++) {
-							map[75 + i][75 + j] = view[i][j];
+							map[47 + i][47 + j] = view[i][j];
 							// if agent sees the key, treasure of axe note its
 							// position in the map
 							if (view[i][j] == '$')
-								treasure = new Position(75 + i, 75 + j);
+								treasure = new Position(47 + i, 47 + j);
 							if (view[i][j] == 'a')
-								seeAxe = new Position(75 + i, 75 + j);
+								seeAxe = new Position(47 + i, 47 + j);
 							if (view[i][j] == 'k')
-								seeKey = new Position(75 + i, 75 + j);
+								seeKey = new Position(47 + i, 47 + j);
 						}
 					}
-					map[77][77] = 'P';
+					map[49][49] = 'p';
 					// the initial corners of the view (facing north)
-					lefttop = new Position(75, 75);
-					righttop = new Position(75, 79);
-					leftbottom = new Position(79, 75);
-					rightbottom = new Position(79, 79);
+					lefttop = new Position(47, 47);
+					righttop = new Position(47, 51);
+					leftbottom = new Position(51, 47);
+					rightbottom = new Position(51, 51);
 
 					// if the agent has made a move ie action
 				} else {
@@ -557,7 +558,7 @@ public class Agent {
 				value = 50;
 			} else if (infront == 'd') {
 				value = 60;
-			}else if (infront == 'P' && gold) {
+			}else if (infront == 'p' && gold) {
 				value = 100;
 			}else {
 				value = -1;
@@ -649,7 +650,7 @@ class SearchTree {
 				int y = S.agentSt.currentPos.y;
 				int[] add = Agent.getDirNum(S.agentSt.direction);
 				char in = S.agentSt.stateMap[x + add[0]][y + add[1]];
-				if (in == ',' || in == '.' || S.getValue() >= 5 || depth == 8) {
+				if (in == ',' || in == '.' || S.getValue() >= 5 || depth == 20) {
 					end = true;
 				} else {
 					newFrontier.addAll(S.setSuccessors());
